@@ -188,7 +188,12 @@ export class ArcApiClient {
   }
 
   async updateProfile(profile: Partial<ArcProfile>): Promise<ArcProfile> {
-    const response = await this.client.put<ArcProfile>('/profile', profile);
+    // Add required @odata.type field for CData Arc API
+    const profileUpdate = {
+      '@odata.type': 'CDataAPI.Profile',
+      ...profile
+    };
+    const response = await this.client.put<ArcProfile>('/profile', profileUpdate);
     return response.data;
   }
 

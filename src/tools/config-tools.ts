@@ -11,8 +11,25 @@ const UpdateProfileSchema = z.object({
   SSOEnableJITProvisioning: z.boolean().optional(),
   SyslogEnable: z.boolean().optional(),
   SysLogEnabledLogs: z.string().optional(),
-  SysLogSSLEnabled: z.boolean().optional()
-});
+  SysLogSSLEnabled: z.boolean().optional(),
+  // Email notification settings
+  NotifyEmail: z.string().email().optional(),
+  NotifyEmailTo: z.string().email().optional(),
+  NotifyEmailFrom: z.string().email().optional(),
+  // SMTP settings
+  SMTPServer: z.string().optional(),
+  SMTPUser: z.string().optional(),
+  SMTPPort: z.string().optional(),
+  SMTPSSLMode: z.string().optional(),
+  // Other profile settings
+  AS4PartyID: z.string().optional(),
+  ProxyHost: z.string().optional(),
+  ProxyPort: z.string().optional(),
+  ProxyType: z.string().optional(),
+  SyslogRemoteHost: z.string().optional(),
+  SyslogRemotePort: z.string().optional(),
+  UITimeFormat: z.string().optional()
+}).passthrough(); // Allow additional properties not explicitly defined
 
 const GetWorkspacesSchema = z.object({
   select: z.string().optional(),
@@ -165,8 +182,68 @@ export function createConfigurationTools(client: ArcApiClient) {
           SysLogSSLEnabled: {
             type: "boolean",
             description: "Enable SSL for syslog communication"
+          },
+          // Email notification settings
+          NotifyEmail: {
+            type: "string",
+            description: "Email address to receive notifications"
+          },
+          NotifyEmailTo: {
+            type: "string",
+            description: "Email address to send notifications to"
+          },
+          NotifyEmailFrom: {
+            type: "string",
+            description: "Email address notifications are sent from"
+          },
+          // SMTP settings
+          SMTPServer: {
+            type: "string",
+            description: "SMTP server hostname or IP address"
+          },
+          SMTPUser: {
+            type: "string",
+            description: "SMTP server username"
+          },
+          SMTPPort: {
+            type: "string",
+            description: "SMTP server port number"
+          },
+          SMTPSSLMode: {
+            type: "string",
+            description: "SMTP SSL mode (e.g., 'None', 'Implicit', 'Explicit')"
+          },
+          // Other settings
+          AS4PartyID: {
+            type: "string",
+            description: "AS4 Party ID for messaging"
+          },
+          ProxyHost: {
+            type: "string",
+            description: "Proxy server hostname or IP address"
+          },
+          ProxyPort: {
+            type: "string",
+            description: "Proxy server port number"
+          },
+          ProxyType: {
+            type: "string",
+            description: "Proxy server type"
+          },
+          SyslogRemoteHost: {
+            type: "string",
+            description: "Remote syslog server hostname"
+          },
+          SyslogRemotePort: {
+            type: "string",
+            description: "Remote syslog server port"
+          },
+          UITimeFormat: {
+            type: "string",
+            description: "Time format for UI display (12 or 24)"
           }
-        }
+        },
+        additionalProperties: true
       },
       handler: async (args: any) => {
         const validated = UpdateProfileSchema.parse(args);
