@@ -60,3 +60,6 @@ pids
 *.pid
 *.seed
 *.pid.lock
+
+# Claude instructions (local development only)
+CLAUDE.md
