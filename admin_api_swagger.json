@@ -1881,12 +1881,81 @@
                 ],
                 "operationId": "updateprofile",
                 "requestBody": {
-                    "description": "The profile entity to update.",
+                    "description": "The profile entity to update. You can update any configuration property by its key name.",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/profile"
+                                "type": "object",
+                                "description": "Profile configuration object containing key-value pairs of settings to update",
+                                "additionalProperties": {
+                                    "type": "string",
+                                    "description": "Any configuration setting value"
+                                },
+                                "properties": {
+                                    "notifyemailfrom": {
+                                        "type": "string",
+                                        "description": "The sender of notification emails"
+                                    },
+                                    "notifyemailto": {
+                                        "type": "string",
+                                        "description": "The receiver of notification emails"
+                                    },
+                                    "smtpserver": {
+                                        "type": "string",
+                                        "description": "The host name or IP address of your SMTP server"
+                                    },
+                                    "smtpuser": {
+                                        "type": "string",
+                                        "description": "The username to authenticate to your SMTP server"
+                                    },
+                                    "smtpport": {
+                                        "type": "string",
+                                        "description": "The port of your SMTP server"
+                                    },
+                                    "smtpsslmode": {
+                                        "type": "string",
+                                        "description": "The SSL mode of your SMTP server"
+                                    },
+                                    "as4:partyid": {
+                                        "type": "string",
+                                        "description": "The Party ID for AS4 messaging profile configuration"
+                                    },
+                                    "ssoenabled": {
+                                        "type": "string",
+                                        "description": "Indicates whether Single Sign-On (SSO) is enabled"
+                                    },
+                                    "proxyhost": {
+                                        "type": "string",
+                                        "description": "The host name or IP address of the proxy"
+                                    },
+                                    "proxyport": {
+                                        "type": "string",
+                                        "description": "The port of your proxy"
+                                    },
+                                    "proxytype": {
+                                        "type": "string",
+                                        "description": "The type of proxy to connect through"
+                                    },
+                                    "syslogremotehost": {
+                                        "type": "string",
+                                        "description": "The remote host of sysLog server"
+                                    },
+                                    "syslogremoteport": {
+                                        "type": "string",
+                                        "description": "The remote port of sysLog server"
+                                    },
+                                    "uitimeformat": {
+                                        "type": "string",
+                                        "description": "Select the time format display preference (12 or 24)"
+                                    }
+                                },
+                                "example": {
+                                    "notifyemailfrom": "admin@example.com",
+                                    "notifyemailto": "alerts@example.com",
+                                    "smtpserver": "smtp.gmail.com",
+                                    "as4:partyid": "mycompany"
+                                }
                             }
                         }
                     }
