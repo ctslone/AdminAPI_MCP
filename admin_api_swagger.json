@@ -4520,195 +4520,79 @@
             },
             "profile": {
                 "type": "object",
+                "description": "System configuration profile containing all application settings",
+                "additionalProperties": {
+                    "type": "string",
+                    "description": "Configuration setting value"
+                },
                 "properties": {
-                    "HeartbeatInterval": {
-                        "description": "The interval in which the application will perform scheduled tasks such as sending files to your trading partners.",
-                        "type": "integer",
-                        "format": "int32"
+                    "@odata.context": {
+                        "type": "string",
+                        "description": "OData context metadata"
                     },
-                    "NotifyEmail": {
-                        "description": "Send an email to the specified email addresses when an error is encountered.",
-                        "type": "string"
+                    "as4:partyid": {
+                        "type": "string",
+                        "description": "The Party ID for AS4 messaging profile configuration"
                     },
-                    "NotifyEmailFrom": {
-                        "description": "The sender of notification emails.",
-                        "type": "string"
+                    "as4:partyidtype": {
+                        "type": "string",
+                        "description": "The Party ID type for AS4 messaging profile configuration"
                     },
-                    "NotifyEmailTo": {
-                        "description": "The receiver of notification emails.",
-                        "type": "string"
+                    "notifyemailfrom": {
+                        "type": "string",
+                        "description": "The sender of notification emails"
                     },
-                    "NotifyEmailSubject": {
-                        "description": "The subject of notification emails.",
-                        "type": "string"
+                    "notifyemailto": {
+                        "type": "string",
+                        "description": "The receiver of notification emails"
                     },
-                    "SMTPServer": {
-                        "description": "The host name or IP address of your SMTP server.",
-                        "type": "string"
+                    "smtpserver": {
+                        "type": "string",
+                        "description": "The host name or IP address of your SMTP server"
                     },
-                    "SMTPUser": {
-                        "description": "The username to authenticate to your SMTP server.",
-                        "type": "string"
+                    "smtpuser": {
+                        "type": "string",
+                        "description": "The username to authenticate to your SMTP server"
                     },
-                    "SMTPPassword": {
-                        "description": "The password to authenticate to your SMTP server.",
-                        "type": "string"
+                    "smtppassword": {
+                        "type": "string",
+                        "description": "The password to authenticate to your SMTP server"
                     },
-                    "SMTPPort": {
-                        "description": "The port of your SMTP server.",
-                        "type": "string"
+                    "smtpport": {
+                        "type": "string",
+                        "description": "The port of your SMTP server"
                     },
-                    "SMTPSSLMode": {
-                        "description": "The SSL mode of your SMTP server.",
-                        "type": "string"
+                    "smtpsslmode": {
+                        "type": "string",
+                        "description": "The SSL mode of your SMTP server"
                     },
-                    "SendStatusReport": {
-                        "description": "Send a status report to the email address .",
-                        "type": "boolean"
+                    "ssoenabled": {
+                        "type": "string",
+                        "description": "Indicates whether Single Sign-On (SSO) is enabled"
                     },
-                    "SendReportInterval": {
-                        "description": "The interval of send a status report to the email address.",
-                        "type": "string"
+                    "proxyhost": {
+                        "type": "string",
+                        "description": "The host name or IP address of the proxy"
                     },
-                    "NotifyWindowsEvent": {
-                        "description": "Write error messages to the Windows Application Event Log.",
-                        "type": "boolean"
+                    "proxyport": {
+                        "type": "string",
+                        "description": "The port of your proxy"
                     },
-                    "NotifyStopStart": {
-                        "description": "Log when the application starts and stops in the event log.",
-                        "type": "boolean"
+                    "proxytype": {
+                        "type": "string",
+                        "description": "The type of proxy to connect through"
                     },
-                    "ProxyType": {
-                        "description": "The type of proxy to connect through.",
-                        "type": "string"
+                    "syslogremotehost": {
+                        "type": "string",
+                        "description": "The remote host of sysLog server"
                     },
-                    "ProxyHost": {
-                        "description": "The host name or IP address of the proxy.",
-                        "type": "string"
-                    },
-                    "ProxyPort": {
-                        "description": "The port of your proxy.",
-                        "type": "string"
-                    },
-                    "ProxyUser": {
-                        "description": "The username to use when authenticating to your proxy.",
-                        "type": "string"
-                    },
-                    "ProxyPassword": {
-                        "description": "The password to use when authenticating to your proxy.",
-                        "type": "string"
-                    },
-                    "ProxyAuthscheme": {
-                        "description": "The auth scheme to use when authenticating to your proxy.",
-                        "type": "string"
-                    },
-                    "SSOClientId": {
-                        "description": "The id of the OauthClient",
-                        "type": "string"
-                    },
-                    "SSOClientSecret": {
-                        "description": "The secret used by the OAuth Client to Authenticate to the Authorization Server",
-                        "type": "string"
-                    },
-                    "SSOIssuerIdentifier": {
-                        "description": "The id is used to prevent authorization server mix- up attacks",
-                        "type": "string"
-                    },
-                    "SSOScopes": {
-                        "description": "The mechanism in OAuth  to limit an application's access to a user's account",
-                        "type": "string"
-                    },
-                    "SSOAudienceURIs": {
-                        "description": "The id of the OauthClient",
-                        "type": "string"
-                    },
-                    "SSOAuthorizationURL": {
-                        "description": "The URL initiates the authorization flow that authenticates the user with the Id",
-                        "type": "string"
-                    },
-                    "SSOTokenURL": {
-                        "description": "The collection of data that is passed from one system to another",
-                        "type": "string"
-                    },
-                    "SSOLogoffURL": {
-                        "description": "The URL allows the user to logout from a single session and  all related sessions",
-                        "type": "string"
-                    },
-                    "SSOIssuerCertificate": {
-                        "description": "The certificate was signed from the issuer",
-                        "type": "string"
-                    },
-                    "SSOKeyClaim": {
-                        "description": "The statement that a particular entity has a particular property",
-                        "type": "string"
-                    },
-                    "SSOTokenSignatureAlgorithm": {
-                        "description": "The algorithm for the token signature",
-                        "type": "string"
-                    },
-                    "SSOResponseMode": {
-                        "description": "The method that used to send the data from the custom id provider to Azure",
-                        "type": "string"
-                    },
-                    "SSOType": {
-                        "description": "The type of SSO",
-                        "type": "string"
-                    },
-                    "SSOEnabled": {
-                        "description": "Indicates whether Single Sign-On (SSO) is enabled.",
-                        "type": "string"
-                    },
-                    "SSOEnableJITProvisioning": {
-                        "description": "Indicates whether Just-In-Time (JIT) provisioning for SSO users is enabled.",
-                        "type": "string"
-                    },
-                    "SSODefaultRole": {
-                        "description": "Specifies the default role assigned to users created or authenticated via SSO, especially if JIT provisioning is active.",
-                        "type": "string"
-                    },
-                    "SyslogEnable": {
-                        "description": "Enable sending logs to the sysLog server",
-                        "type": "string"
-                    },
-                    "SyslogRemoteHost": {
-                        "description": "The remote host of sysLog server",
-                        "type": "string"
-                    },
-                    "SyslogRemotePort": {
-                        "description": "The remote port of sysLog server",
-                        "type": "string"
-                    },
-                    "SyslogProtocol": {
-                        "description": "Protocol to send log to sysLog server, tcp or udp",
-                        "type": "string"
-                    },
-                    "SysLogEnabledLogs": {
-                        "description": "The comma separated list which includes the supported log types",
-                        "type": "string"
-                    },
-                    "SysLogSSLEnabled": {
-                        "description": "Enable the SSL",
-                        "type": "string"
-                    },
-                    "SysLogSSLAcceptServerCert": {
-                        "description": "Instructs to unconditionally accept the server certificate that matches the supplied certificate",
-                        "type": "string"
-                    },
-                    "SysLogVersion": {
-                        "description": "The identification of the CEF format version, 0 or 1",
-                        "type": "string"
-                    },
-                    "SysLogFacility": {
-                        "description": "The value from 0 to 23, with each value being a different part of the system",
-                        "type": "string"
-                    },
-                    "SysLogMessageFormat": {
-                        "description": "The message format, support Common Event Format(CEF), Structured Data(only if SysLogVersion = 1) or JSON",
-                        "type": "string"
+                    "syslogremoteport": {
+                        "type": "string",
+                        "description": "The remote port of sysLog server"
                     },
                     "uitimeformat": {
-                        "description": "Select the time format display preference",
-                        "type": "string"
+                        "type": "string",
+                        "description": "Select the time format display preference"
                     }
                 }
             },
