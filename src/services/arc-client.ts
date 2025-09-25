@@ -183,8 +183,14 @@ export class ArcApiClient {
 
   // Profile operations
   async getProfile(): Promise<ArcProfile[]> {
-    const response = await this.client.get<ApiResponse<ArcProfile>>('/profile');
-    return response.data.value || [];
+    const response = await this.client.get('/profile');
+
+    // Profile endpoint returns a direct object, not OData {value: [...]} format
+    if (response.data && typeof response.data === 'object') {
+      return [response.data]; // Wrap single object in array for consistency
+    }
+
+    return [];
   }
 
   async updateProfile(profile: Partial<ArcProfile>): Promise<ArcProfile> {
