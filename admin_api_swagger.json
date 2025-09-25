@@ -1887,74 +1887,82 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "description": "Profile configuration object containing key-value pairs of settings to update",
-                                "additionalProperties": {
-                                    "type": "string",
-                                    "description": "Any configuration setting value"
-                                },
+                                "description": "Profile configuration object for OData updates using Pascal case properties",
+                                "required": ["@odata.type"],
+                                "additionalProperties": true,
                                 "properties": {
-                                    "notifyemailfrom": {
+                                    "@odata.type": {
+                                        "type": "string",
+                                        "description": "Required OData type identifier",
+                                        "enum": ["CDataAPI.Profile"]
+                                    },
+                                    "NotifyEmailFrom": {
                                         "type": "string",
                                         "description": "The sender of notification emails"
                                     },
-                                    "notifyemailto": {
+                                    "NotifyEmail": {
                                         "type": "string",
                                         "description": "The receiver of notification emails"
                                     },
-                                    "smtpserver": {
+                                    "NotifyEmailTo": {
+                                        "type": "string",
+                                        "description": "The receiver of notification emails"
+                                    },
+                                    "SMTPServer": {
                                         "type": "string",
                                         "description": "The host name or IP address of your SMTP server"
                                     },
-                                    "smtpuser": {
+                                    "SMTPUser": {
                                         "type": "string",
                                         "description": "The username to authenticate to your SMTP server"
                                     },
-                                    "smtpport": {
+                                    "SMTPPort": {
                                         "type": "string",
                                         "description": "The port of your SMTP server"
                                     },
-                                    "smtpsslmode": {
+                                    "SMTPSSLMode": {
                                         "type": "string",
                                         "description": "The SSL mode of your SMTP server"
                                     },
-                                    "as4:partyid": {
+                                    "AS4PartyID": {
                                         "type": "string",
                                         "description": "The Party ID for AS4 messaging profile configuration"
                                     },
-                                    "ssoenabled": {
+                                    "SSOEnabled": {
                                         "type": "string",
                                         "description": "Indicates whether Single Sign-On (SSO) is enabled"
                                     },
-                                    "proxyhost": {
+                                    "ProxyHost": {
                                         "type": "string",
                                         "description": "The host name or IP address of the proxy"
                                     },
-                                    "proxyport": {
+                                    "ProxyPort": {
                                         "type": "string",
                                         "description": "The port of your proxy"
                                     },
-                                    "proxytype": {
+                                    "ProxyType": {
                                         "type": "string",
                                         "description": "The type of proxy to connect through"
                                     },
-                                    "syslogremotehost": {
+                                    "SyslogRemoteHost": {
                                         "type": "string",
                                         "description": "The remote host of sysLog server"
                                     },
-                                    "syslogremoteport": {
+                                    "SyslogRemotePort": {
                                         "type": "string",
                                         "description": "The remote port of sysLog server"
                                     },
-                                    "uitimeformat": {
+                                    "UITimeFormat": {
                                         "type": "string",
                                         "description": "Select the time format display preference (12 or 24)"
                                     }
                                 },
                                 "example": {
-                                    "notifyemailfrom": "admin@example.com",
-                                    "notifyemailto": "alerts@example.com",
-                                    "smtpserver": "smtp.gmail.com",
-                                    "as4:partyid": "mycompany"
+                                    "@odata.type": "CDataAPI.Profile",
+                                    "NotifyEmail": "foo@bar.com",
+                                    "NotifyEmailFrom": "admin@example.com",
+                                    "SMTPServer": "smtp.gmail.com",
+                                    "AS4PartyID": "mycompany"
                                 }
                             }
                         }
