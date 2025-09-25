@@ -1,0 +1,443 @@
+import { z } from 'zod';
+import type { ArcApiClient } from '../services/arc-client.js';
+
+// Zod schemas for validation
+const GetConnectorsSchema = z.object({
+  select: z.string().optional(),
+  filter: z.string().optional(),
+  orderby: z.string().optional(),
+  top: z.number().positive().optional(),
+  skip: z.number().nonnegative().optional()
+});
+
+const GetConnectorSchema = z.object({
+  connectorId: z.string().min(1, "Connector ID is required")
+});
+
+const CreateConnectorSchema = z.object({
+  connectorId: z.string().min(1, "Connector ID is required"),
+  workspaceId: z.string().optional(),
+  connectorType: z.string().min(1, "Connector type is required"),
+  automationSend: z.boolean().optional(),
+  automationRetryInterval: z.number().optional(),
+  automationMaxAttempts: z.number().optional(),
+  automationReceive: z.boolean().optional(),
+  receiveInterval: z.string().optional(),
+  maxWorkers: z.number().optional(),
+  maxFiles: z.number().optional(),
+  sendFolder: z.string().optional(),
+  receiveFolder: z.string().optional(),
+  sentFolder: z.string().optional(),
+  saveToSentFolder: z.boolean().optional(),
+  sentFolderScheme: z.string().optional(),
+  logLevel: z.string().optional(),
+  logSubFolderScheme: z.string().optional(),
+  logMessages: z.boolean().optional()
+});
+
+const UpdateConnectorSchema = z.object({
+  connectorId: z.string().min(1, "Connector ID is required"),
+  workspaceId: z.string().optional(),
+  connectorType: z.string().optional(),
+  automationSend: z.boolean().optional(),
+  automationRetryInterval: z.number().optional(),
+  automationMaxAttempts: z.number().optional(),
+  automationReceive: z.boolean().optional(),
+  receiveInterval: z.string().optional(),
+  maxWorkers: z.number().optional(),
+  maxFiles: z.number().optional(),
+  sendFolder: z.string().optional(),
+  receiveFolder: z.string().optional(),
+  sentFolder: z.string().optional(),
+  saveToSentFolder: z.boolean().optional(),
+  sentFolderScheme: z.string().optional(),
+  logLevel: z.string().optional(),
+  logSubFolderScheme: z.string().optional(),
+  logMessages: z.boolean().optional()
+});
+
+const DeleteConnectorSchema = z.object({
+  connectorId: z.string().min(1, "Connector ID is required")
+});
+
+export function createConnectorTools(client: ArcApiClient) {
+  return [
+    {
+      name: "list_connectors",
+      description: "List Arc connectors with optional filtering and pagination",
+      inputSchema: {
+        type: "object",
+        properties: {
+          select: {
+            type: "string",
+            description: "Comma-separated list of properties to include (e.g., 'ConnectorId,Name,Type')"
+          },
+          filter: {
+            type: "string", 
+            description: "OData filter expression (e.g., \"Type eq 'AS2'\" or \"Enabled eq true\")"
+          },
+          orderby: {
+            type: "string",
+            description: "Order results by property (e.g., 'Name ASC' or 'ConnectorId DESC')"
+          },
+          top: {
+            type: "number",
+            description: "Maximum number of results to return"
+          },
+          skip: {
+            type: "number", 
+            description: "Number of results to skip for pagination"
+          }
+        }
+      },
+      handler: async (args: any) => {
+        const validated = GetConnectorsSchema.parse(args);
+        
+        const queryParams = {
+          $select: validated.select,
+          $filter: validated.filter,
+          $orderby: validated.orderby,
+          $top: validated.top,
+          $skip: validated.skip
+        };
+
+        const connectors = await client.getConnectors(queryParams);
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: `**Found ${connectors.length} connectors:**\n\n` +
+                connectors.map(c => 
+                  `• **${c.ConnectorId}**\n` +
+                  `  Workspace: ${c.WorkspaceId || 'default'}\n` +
+                  `  Type: ${c.ConnectorType || 'Unknown'}\n` +
+                  `  Auto Send: ${c.AutomationSend ? 'Yes' : 'No'}\n` +
+                  `  Auto Receive: ${c.AutomationReceive ? 'Yes' : 'No'}\n` +
+                  `  Log Level: ${c.LogLevel || 'N/A'}\n`
+                ).join('\n')
+            }
+          ]
+        };
+      }
+    },
+
+    {
+      name: "get_connector", 
+      description: "Get detailed information about a specific Arc connector",
+      inputSchema: {
+        type: "object",
+        properties: {
+          connectorId: {
+            type: "string",
+            description: "The unique identifier of the connector"
+          }
+        },
+        required: ["connectorId"]
+      },
+      handler: async (args: any) => {
+        const validated = GetConnectorSchema.parse(args);
+        const connector = await client.getConnector(validated.connectorId);
+        
+        if (!connector) {
+          return {
+            content: [{
+              type: "text", 
+              text: `Connector '${validated.connectorId}' not found.`
+            }]
+          };
+        }
+
+        return {
+          content: [{
+            type: "text",
+            text: `**Connector Details**\n\n` +
+              `**ID:** ${connector.ConnectorId}\n` +
+              `**Workspace:** ${connector.WorkspaceId || 'default'}\n` +
+              `**Type:** ${connector.ConnectorType || 'Unknown'}\n` +
+              `**Auto Send:** ${connector.AutomationSend ? 'Yes' : 'No'}\n` +
+              `**Auto Receive:** ${connector.AutomationReceive ? 'Yes' : 'No'}\n` +
+              `**Retry Interval:** ${connector.AutomationRetryInterval || 'N/A'} minutes\n` +
+              `**Max Attempts:** ${connector.AutomationMaxAttempts || 'N/A'}\n` +
+              `**Receive Interval:** ${connector.ReceiveInterval || 'N/A'}\n` +
+              `**Max Workers:** ${connector.MaxWorkers || 'Default'}\n` +
+              `**Max Files:** ${connector.MaxFiles || 'Default'}\n` +
+              `**Log Level:** ${connector.LogLevel || 'N/A'}\n` +
+              `**Log Messages:** ${connector.LogMessages ? 'Yes' : 'No'}\n` +
+              `**Save To Sent:** ${connector.SaveToSentFolder ? 'Yes' : 'No'}\n` +
+              (connector.SentFolderScheme ? `**Sent Folder Scheme:** ${connector.SentFolderScheme}\n` : '') +
+              (connector.LogSubFolderScheme ? `**Log Subfolder Scheme:** ${connector.LogSubFolderScheme}\n` : '')
+          }]
+        };
+      }
+    },
+
+    {
+      name: "create_connector",
+      description: "Create a new Arc connector. Requires connectorId and connectorType. If workspaceId is not specified, connector is created in the default workspace.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          connectorId: {
+            type: "string", 
+            description: "Unique identifier for the new connector (required)"
+          },
+          workspaceId: {
+            type: "string",
+            description: "The workspace ID (defaults to 'default' if not specified)"
+          },
+          connectorType: {
+            type: "string",
+            description: "Connector type (e.g., 'AS2', 'FTP', 'SFTP', 'REST')"
+          },
+          automationSend: {
+            type: "boolean",
+            description: "Whether to automatically process files in the Send folder"
+          },
+          automationRetryInterval: {
+            type: "number",
+            description: "Time to wait after error before retry, in minutes"
+          },
+          automationMaxAttempts: {
+            type: "number",
+            description: "Maximum retry attempts (0 for unlimited)"
+          },
+          automationReceive: {
+            type: "boolean",
+            description: "Whether to automatically receive files at specified interval"
+          },
+          receiveInterval: {
+            type: "string", 
+            description: "Interval for automatic file receiving"
+          },
+          maxWorkers: {
+            type: "number",
+            description: "Maximum workers from pool for this connector"
+          },
+          maxFiles: {
+            type: "number",
+            description: "Maximum files to process per worker assignment"
+          },
+          logLevel: {
+            type: "string",
+            description: "Log level: None, Error, Warning, Info, Debug, or Trace"
+          },
+          logMessages: {
+            type: "boolean",
+            description: "Whether to keep message copies in Logs directory"
+          },
+          saveToSentFolder: {
+            type: "boolean",
+            description: "Whether to keep copies in Sent folder"
+          },
+          sentFolderScheme: {
+            type: "string",
+            description: "Sent folder structure: Daily, Weekly, Monthly, or Yearly"
+          },
+          logSubFolderScheme: {
+            type: "string",
+            description: "Log folder structure: Daily, Weekly, Monthly, or Yearly"
+          }
+        },
+        required: ["connectorId", "connectorType"]
+      },
+      handler: async (args: any) => {
+        const validated = CreateConnectorSchema.parse(args);
+        
+        const connectorData = {
+          ConnectorId: validated.connectorId,
+          WorkspaceId: validated.workspaceId,
+          ConnectorType: validated.connectorType,
+          AutomationSend: validated.automationSend,
+          AutomationRetryInterval: validated.automationRetryInterval,
+          AutomationMaxAttempts: validated.automationMaxAttempts,
+          AutomationReceive: validated.automationReceive,
+          ReceiveInterval: validated.receiveInterval,
+          MaxWorkers: validated.maxWorkers,
+          MaxFiles: validated.maxFiles,
+          SendFolder: validated.sendFolder,
+          ReceiveFolder: validated.receiveFolder,
+          SentFolder: validated.sentFolder,
+          SaveToSentFolder: validated.saveToSentFolder,
+          SentFolderScheme: validated.sentFolderScheme,
+          LogLevel: validated.logLevel,
+          LogSubFolderScheme: validated.logSubFolderScheme,
+          LogMessages: validated.logMessages
+        };
+
+        try {
+          const connector = await client.createConnector(connectorData);
+          
+          let responseText = `**Connector Created Successfully**\n\n` +
+            `**ID:** ${connector.ConnectorId}\n` +
+            `**Workspace:** ${connector.WorkspaceId || 'default'}\n` +
+            `**Type:** ${connector.ConnectorType}`;
+
+          // Only show automation settings if they were explicitly provided
+          if (validated.automationSend !== undefined) {
+            responseText += `\n**Auto Send:** ${connector.AutomationSend ? 'Yes' : 'No'}`;
+          }
+          if (validated.automationReceive !== undefined) {
+            responseText += `\n**Auto Receive:** ${connector.AutomationReceive ? 'Yes' : 'No'}`;
+          }
+
+          return {
+            content: [{
+              type: "text",
+              text: responseText
+            }]
+          };
+        } catch (error: any) {
+          // Check for duplicate connector error
+          if (error.response?.data?.error?.code === 'CreateConnector' && 
+              error.response?.data?.error?.message?.includes('already exists')) {
+            return {
+              content: [{
+                type: "text",
+                text: `**Connector Already Exists**\n\nConnector '${validated.connectorId}' already exists in workspace '${validated.workspaceId || 'default'}'. Connector IDs are case-insensitive.`
+              }]
+            };
+          }
+          
+          // Re-throw other errors to be handled by the main error handler
+          throw error;
+        }
+      }
+    },
+
+    {
+      name: "update_connector",
+      description: "Update an existing Arc connector's configuration", 
+      inputSchema: {
+        type: "object",
+        properties: {
+          connectorId: {
+            type: "string",
+            description: "The unique identifier of the connector to update"
+          },
+          workspaceId: {
+            type: "string",
+            description: "The workspace ID"
+          },
+          connectorType: {
+            type: "string",
+            description: "Connector type (e.g., 'AS2', 'FTP', 'SFTP', 'REST')"
+          },
+          automationSend: {
+            type: "boolean",
+            description: "Whether to automatically process files in the Send folder"
+          },
+          automationRetryInterval: {
+            type: "number",
+            description: "Time to wait after error before retry, in minutes"
+          },
+          automationMaxAttempts: {
+            type: "number",
+            description: "Maximum retry attempts (0 for unlimited)"
+          },
+          automationReceive: {
+            type: "boolean",
+            description: "Whether to automatically receive files at specified interval"
+          },
+          receiveInterval: {
+            type: "string", 
+            description: "Interval for automatic file receiving"
+          },
+          maxWorkers: {
+            type: "number",
+            description: "Maximum workers from pool for this connector"
+          },
+          maxFiles: {
+            type: "number",
+            description: "Maximum files to process per worker assignment"
+          },
+          logLevel: {
+            type: "string",
+            description: "Log level: None, Error, Warning, Info, Debug, or Trace"
+          },
+          logMessages: {
+            type: "boolean",
+            description: "Whether to keep message copies in Logs directory"
+          },
+          saveToSentFolder: {
+            type: "boolean",
+            description: "Whether to keep copies in Sent folder"
+          },
+          sentFolderScheme: {
+            type: "string",
+            description: "Sent folder structure: Daily, Weekly, Monthly, or Yearly"
+          },
+          logSubFolderScheme: {
+            type: "string",
+            description: "Log folder structure: Daily, Weekly, Monthly, or Yearly"
+          }
+        },
+        required: ["connectorId"]
+      },
+      handler: async (args: any) => {
+        const validated = UpdateConnectorSchema.parse(args);
+        
+        const updates = {
+          ...(validated.workspaceId !== undefined && { WorkspaceId: validated.workspaceId }),
+          ...(validated.connectorType !== undefined && { ConnectorType: validated.connectorType }),
+          ...(validated.automationSend !== undefined && { AutomationSend: validated.automationSend }),
+          ...(validated.automationRetryInterval !== undefined && { AutomationRetryInterval: validated.automationRetryInterval }),
+          ...(validated.automationMaxAttempts !== undefined && { AutomationMaxAttempts: validated.automationMaxAttempts }),
+          ...(validated.automationReceive !== undefined && { AutomationReceive: validated.automationReceive }),
+          ...(validated.receiveInterval !== undefined && { ReceiveInterval: validated.receiveInterval }),
+          ...(validated.maxWorkers !== undefined && { MaxWorkers: validated.maxWorkers }),
+          ...(validated.maxFiles !== undefined && { MaxFiles: validated.maxFiles }),
+          ...(validated.sendFolder !== undefined && { SendFolder: validated.sendFolder }),
+          ...(validated.receiveFolder !== undefined && { ReceiveFolder: validated.receiveFolder }),
+          ...(validated.sentFolder !== undefined && { SentFolder: validated.sentFolder }),
+          ...(validated.saveToSentFolder !== undefined && { SaveToSentFolder: validated.saveToSentFolder }),
+          ...(validated.sentFolderScheme !== undefined && { SentFolderScheme: validated.sentFolderScheme }),
+          ...(validated.logLevel !== undefined && { LogLevel: validated.logLevel }),
+          ...(validated.logSubFolderScheme !== undefined && { LogSubFolderScheme: validated.logSubFolderScheme }),
+          ...(validated.logMessages !== undefined && { LogMessages: validated.logMessages })
+        };
+
+        const connector = await client.updateConnector(validated.connectorId, updates);
+        
+        return {
+          content: [{
+            type: "text", 
+            text: `**Connector Updated Successfully**\n\n` +
+              `**ID:** ${connector.ConnectorId}\n` +
+              `**Workspace:** ${connector.WorkspaceId || 'default'}\n` +
+              `**Type:** ${connector.ConnectorType || 'Unknown'}\n` +
+              `**Auto Send:** ${connector.AutomationSend ? 'Yes' : 'No'}\n` +
+              `**Auto Receive:** ${connector.AutomationReceive ? 'Yes' : 'No'}`
+          }]
+        };
+      }
+    },
+
+    {
+      name: "delete_connector",
+      description: "Delete an Arc connector permanently",
+      inputSchema: {
+        type: "object", 
+        properties: {
+          connectorId: {
+            type: "string",
+            description: "The unique identifier of the connector to delete"
+          }
+        },
+        required: ["connectorId"]
+      },
+      handler: async (args: any) => {
+        const validated = DeleteConnectorSchema.parse(args);
+        
+        await client.deleteConnector(validated.connectorId);
+        
+        return {
+          content: [{
+            type: "text",
+            text: `**Connector Deleted**\n\nConnector '${validated.connectorId}' has been permanently deleted.`
+          }]
+        };
+      }
+    }
+  ];
+}

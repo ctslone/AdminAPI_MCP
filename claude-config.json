@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "cdata-arc-server": {
+      "command": "node",
+      "args": ["./dist/index.js"],
+      "env": {
+        "CDATA_BASE_URL": "http://localhost:8181/api.rsc",
+        "CDATA_AUTH_TOKEN": "your-token-here",
+        "MCP_TRANSPORT_MODE": "stdio"
+      }
+    }
+  }
+}
