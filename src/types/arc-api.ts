@@ -94,6 +94,28 @@ export interface ArcCertificate {
   ConnectorIds?: string;
 }
 
+export interface ArcReport {
+  Name?: string;
+  Type?: string;
+  CreatedBy?: string;
+  CreatedTime?: string;
+  ModifiedTime?: string;
+  TimePeriod?: string;
+  Columns?: string;
+  GroupRows?: string;
+  Filters?: string;
+  Summary?: string;
+  Schedule?: string;
+  StartDate?: string;
+  EndDate?: string;
+  Format?: string;
+  EmailReport?: boolean;
+  EmailSubject?: string;
+  EmailRecipients?: string;
+  TimePeriodStart?: string;
+  TimePeriodEnd?: string;
+}
+
 // API response types
 export interface ApiResponse<T> {
   value?: T[];
