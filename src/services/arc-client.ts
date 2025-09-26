@@ -10,6 +10,8 @@ import type {
   ArcCertificate,
   ArcReport,
   ArcRequest,
+  CleanupInput,
+  CleanupResult,
   ApiResponse,
   QueryParams
 } from '../types/arc-api.js';
@@ -414,5 +416,11 @@ export class ArcApiClient {
       }
     });
     return parseInt(response.data) || 0;
+  }
+
+  // Action operations
+  async cleanup(input: CleanupInput): Promise<CleanupResult> {
+    const response = await this.client.post<CleanupResult>('/cleanup', input);
+    return response.data;
   }
 }

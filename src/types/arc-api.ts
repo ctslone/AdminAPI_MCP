@@ -208,6 +208,20 @@ export interface ArcRequest {
   InstanceId?: string;
 }
 
+// Action input/output types
+export interface CleanupInput {
+  Type?: string; // Whether to Archive or Delete files
+  Age?: string; // Minimum age of files to be cleaned up, in days
+  WorkspaceId?: string; // The Id of the workspace. If not set, all workspaces will be cleaned up
+  ConnectorId?: string; // The Id of the connector. If not set, all connectors will be cleaned up
+}
+
+export interface CleanupResult {
+  message?: string;
+  success?: boolean;
+  [key: string]: any; // Allow additional properties in response
+}
+
 // API response types
 export interface ApiResponse<T> {
   value?: T[];

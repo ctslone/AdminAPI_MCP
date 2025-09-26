@@ -19,6 +19,7 @@ import { createReportTools } from './tools/report-tools.js';
 import { createRequestTools } from './tools/request-tools.js';
 import { createVaultTools } from './tools/vault-tools.js';
 import { createWorkspaceTools } from './tools/workspace-tools.js';
+import { createActionTools } from './tools/action-tools.js';
 
 // Configuration from environment variables
 const CDATA_BASE_URL = process.env.CDATA_BASE_URL || 'http://localhost:8181/api.rsc';
@@ -70,7 +71,8 @@ function getTools(): any[] {
       ...createReportTools(arcClient),
       ...createRequestTools(arcClient),
       ...createVaultTools(arcClient),
-      ...createWorkspaceTools(arcClient)
+      ...createWorkspaceTools(arcClient),
+      ...createActionTools(arcClient)
     ];
     
     console.error(`[MCP] Loaded ${allTools.length} tools successfully`);
