@@ -47,12 +47,38 @@ export function createWorkspaceTools(client: ArcApiClient) {
           if (args.filter) summary += ` matching filter: ${args.filter}`;
 
           const workspaceList = workspaces.map(w => {
-            const id = w.Workspaceid || 'Unknown';
-            const name = w.Name || 'Unnamed';
-            const desc = w.Description ? ` - ${w.Description}` : '';
-            const created = w.CreatedDate ? ` (Created: ${w.CreatedDate})` : '';
-            return `**${id}** (${name})${desc}${created}`;
-          }).join('\n');
+            const id = w.workspaceid || w.Workspaceid || 'Unknown';
+            const type = w.workspacetype || 'Unknown';
+
+            // Build a comprehensive property list
+            const properties = [];
+
+            // Core properties
+            if (w.workspacetype) properties.push(`Type: ${w.workspacetype}`);
+
+            // Email settings (only show if configured)
+            if (w.smtpserver) properties.push(`SMTP Server: ${w.smtpserver}`);
+            if (w.smtpport) properties.push(`SMTP Port: ${w.smtpport}`);
+            if (w.smtpuser) properties.push(`SMTP User: ${w.smtpuser}`);
+            if (w.emailprotocol) properties.push(`Email Protocol: ${w.emailprotocol}`);
+
+            // S3 settings (only show if configured)
+            if (w.s3bucket) properties.push(`S3 Bucket: ${w.s3bucket}`);
+            if (w.s3region) properties.push(`S3 Region: ${w.s3region}`);
+            if (w.s3url) properties.push(`S3 URL: ${w.s3url}`);
+
+            // Performance settings (only show if configured)
+            if (w.maxworkersperport) properties.push(`Max Workers: ${w.maxworkersperport}`);
+            if (w.maxfilesperport) properties.push(`Max Files: ${w.maxfilesperport}`);
+
+            // Override flags (only show if true)
+            if (w.overrideperformancesettings === 'true') properties.push(`Performance Override: Yes`);
+            if (w.overridecleanupoptions === 'true') properties.push(`Cleanup Override: Yes`);
+            if (w.overrideemailsettings === 'true') properties.push(`Email Override: Yes`);
+
+            const propSummary = properties.length > 0 ? `\n  ${properties.join(', ')}` : '';
+            return `**${id}** (${type})${propSummary}`;
+          }).join('\n\n');
 
           return {
             content: [{
@@ -106,12 +132,79 @@ export function createWorkspaceTools(client: ArcApiClient) {
             };
           }
 
-          const details = [
-            `**Workspace ID:** ${workspace.Workspaceid}`,
-            workspace.Name ? `**Name:** ${workspace.Name}` : null,
-            workspace.Description ? `**Description:** ${workspace.Description}` : null,
-            workspace.CreatedDate ? `**Created:** ${workspace.CreatedDate}` : null
-          ].filter(Boolean).join('\n');
+          const id = workspace.workspaceid || workspace.Workspaceid;
+          const details = [`**Workspace ID:** ${id}`];
+
+          // Core properties
+          if (workspace.workspacetype) details.push(`**Type:** ${workspace.workspacetype}`);
+
+          // Email configuration
+          if (workspace.emailprotocol || workspace.smtpserver) {
+            details.push(`\n**Email Configuration:**`);
+            if (workspace.emailprotocol) details.push(`  Protocol: ${workspace.emailprotocol}`);
+            if (workspace.smtpserver) details.push(`  SMTP Server: ${workspace.smtpserver}`);
+            if (workspace.smtpport) details.push(`  SMTP Port: ${workspace.smtpport}`);
+            if (workspace.smtpuser) details.push(`  SMTP User: ${workspace.smtpuser}`);
+            if (workspace.smtpauthmechanism) details.push(`  Auth Mechanism: ${workspace.smtpauthmechanism}`);
+            if (workspace.smtpsslmode) details.push(`  SSL Mode: ${workspace.smtpsslmode}`);
+            if (workspace.emailsendgridurl) details.push(`  SendGrid URL: ${workspace.emailsendgridurl}`);
+          }
+
+          // Notification settings
+          if (workspace.notifyemail || workspace.notifyemailto) {
+            details.push(`\n**Notification Settings:**`);
+            if (workspace.notifyemail) details.push(`  Notify Email: ${workspace.notifyemail}`);
+            if (workspace.notifyemailto) details.push(`  Notify To: ${workspace.notifyemailto}`);
+            if (workspace.notifyemailfrom) details.push(`  Notify From: ${workspace.notifyemailfrom}`);
+            if (workspace.notifyemailsubject) details.push(`  Subject: ${workspace.notifyemailsubject}`);
+          }
+
+          // S3 configuration
+          if (workspace.s3bucket || workspace.s3url) {
+            details.push(`\n**S3 Configuration:**`);
+            if (workspace.s3bucket) details.push(`  Bucket: ${workspace.s3bucket}`);
+            if (workspace.s3region) details.push(`  Region: ${workspace.s3region}`);
+            if (workspace.s3url) details.push(`  URL: ${workspace.s3url}`);
+            if (workspace.s3prefix) details.push(`  Prefix: ${workspace.s3prefix}`);
+            if (workspace.s3accesskey) details.push(`  Access Key: ${workspace.s3accesskey ? '[CONFIGURED]' : '[NOT SET]'}`);
+          }
+
+          // Archive and cleanup
+          if (workspace.archivefolder || workspace.cleanupsendfolder) {
+            details.push(`\n**Archive & Cleanup:**`);
+            if (workspace.archivefolder) details.push(`  Archive Folder: ${workspace.archivefolder}`);
+            if (workspace.archivedestination) details.push(`  Archive Destination: ${workspace.archivedestination}`);
+            if (workspace.cleanupsendfolder) details.push(`  Cleanup Send Folder: ${workspace.cleanupsendfolder}`);
+            if (workspace.cleanupreceivefolder) details.push(`  Cleanup Receive Folder: ${workspace.cleanupreceivefolder}`);
+            if (workspace.cleanupsentfolder) details.push(`  Cleanup Sent Folder: ${workspace.cleanupsentfolder}`);
+            if (workspace.cleanuptransactions) details.push(`  Cleanup Transactions: ${workspace.cleanuptransactions}`);
+          }
+
+          // Performance settings
+          if (workspace.maxworkersperport || workspace.maxfilesperport) {
+            details.push(`\n**Performance Settings:**`);
+            if (workspace.maxworkersperport) details.push(`  Max Workers per Port: ${workspace.maxworkersperport}`);
+            if (workspace.maxfilesperport) details.push(`  Max Files per Port: ${workspace.maxfilesperport}`);
+            if (workspace.backoffinterval) details.push(`  Backoff Interval: ${workspace.backoffinterval}`);
+            if (workspace.backoffminthreshold) details.push(`  Backoff Min Threshold: ${workspace.backoffminthreshold}`);
+            if (workspace.backoffmaxthreshold) details.push(`  Backoff Max Threshold: ${workspace.backoffmaxthreshold}`);
+          }
+
+          // Auto task settings
+          if (workspace.autotasktype || workspace.autotaskinterval) {
+            details.push(`\n**Auto Task Settings:**`);
+            if (workspace.autotasktype) details.push(`  Auto Task Type: ${workspace.autotasktype}`);
+            if (workspace.autotaskinterval) details.push(`  Auto Task Interval: ${workspace.autotaskinterval}`);
+          }
+
+          // Override flags
+          const overrides = [];
+          if (workspace.overrideperformancesettings === 'true') overrides.push('Performance');
+          if (workspace.overridecleanupoptions === 'true') overrides.push('Cleanup');
+          if (workspace.overrideemailsettings === 'true') overrides.push('Email');
+          if (overrides.length > 0) {
+            details.push(`\n**Override Settings:** ${overrides.join(', ')}`);
+          }
 
           return {
             content: [{
@@ -155,7 +248,7 @@ export function createWorkspaceTools(client: ArcApiClient) {
       handler: async (args: any) => {
         try {
           const workspaceData: Partial<ArcWorkspace> = {
-            Workspaceid: args.workspaceId
+            workspaceid: args.workspaceId
           };
 
           if (args.name) workspaceData.Name = args.name;
@@ -368,16 +461,15 @@ export function createWorkspaceTools(client: ArcApiClient) {
       },
       handler: async (args: any) => {
         try {
-          const filter = `contains(tolower(Name),'${args.searchTerm.toLowerCase()}') or contains(tolower(Description),'${args.searchTerm.toLowerCase()}')`;
+          const filter = `contains(tolower(workspaceid),'${args.searchTerm.toLowerCase()}') or contains(tolower(workspacetype),'${args.searchTerm.toLowerCase()}')`;
           const workspaces = await client.getWorkspaces({ $filter: filter });
 
           const summary = `Found ${workspaces.length} workspace(s) matching "${args.searchTerm}"`;
 
           const workspaceList = workspaces.map(w => {
-            const id = w.Workspaceid || 'Unknown';
-            const name = w.Name || 'Unnamed';
-            const desc = w.Description ? ` - ${w.Description}` : '';
-            return `**${id}** (${name})${desc}`;
+            const id = w.workspaceid || w.Workspaceid || 'Unknown';
+            const type = w.workspacetype || 'Unknown';
+            return `**${id}** (${type})`;
           }).join('\n');
 
           return {

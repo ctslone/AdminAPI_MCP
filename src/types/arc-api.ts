@@ -73,10 +73,68 @@ export interface ArcProfile {
 }
 
 export interface ArcWorkspace {
-  Workspaceid: string;
+  // Main properties
+  workspaceid: string;
+  workspacetype?: string;
+
+  // Email settings
+  emailprotocol?: string;
+  smtpserver?: string;
+  smtpport?: string;
+  smtpuser?: string;
+  smtpauthmechanism?: string;
+  smtpsslmode?: string;
+  smtpsslcert?: string;
+  smtpotherconfigs?: string;
+  emailsendgridurl?: string;
+  emailsendgridapikey?: string;
+
+  // Notification settings
+  notifyemail?: string;
+  notifyemailto?: string;
+  notifyemailfrom?: string;
+  notifyemailsubject?: string;
+  allowarcscriptinalertssubject?: string;
+
+  // S3 settings
+  s3url?: string;
+  s3bucket?: string;
+  s3accesskey?: string;
+  s3region?: string;
+  s3prefix?: string;
+
+  // Archive and cleanup settings
+  archivefolder?: string;
+  archivedestination?: string;
+  cleanupsendfolder?: string;
+  cleanupreceivefolder?: string;
+  cleanupsentfolder?: string;
+  cleanuptransactions?: string;
+
+  // Performance settings
+  maxworkersperport?: string;
+  maxfilesperport?: string;
+  backoffinterval?: string;
+  backoffminthreshold?: string;
+  backoffmaxthreshold?: string;
+
+  // Auto task settings
+  autotasktype?: string;
+  autotaskinterval?: string;
+
+  // Override flags
+  overrideperformancesettings?: string;
+  overridecleanupoptions?: string;
+  overrideemailsettings?: string;
+
+  // Legacy capitalized properties (for backwards compatibility)
+  Workspaceid?: string;
   Name?: string;
   Description?: string;
   CreatedDate?: string;
+
+  // Allow any additional properties since API might return more
+  [key: string]: any;
 }
 
 export interface ArcVault {
