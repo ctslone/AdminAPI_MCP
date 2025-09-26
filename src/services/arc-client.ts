@@ -259,6 +259,25 @@ export class ArcApiClient {
     await this.client.delete(`/workspaces('${workspaceId}')`);
   }
 
+  async getWorkspacesCount(params?: QueryParams): Promise<number> {
+    const queryString = this.buildQueryString(params);
+    const response = await this.client.get<string>(`/workspaces/$count${queryString}`, {
+      headers: {
+        'Accept': 'text/plain; charset=utf-8'
+      }
+    });
+    return parseInt(response.data) || 0;
+  }
+
+  async getWorkspaceProperty(workspaceId: string, propertyName: string): Promise<string> {
+    const response = await this.client.get<string>(`/workspaces('${workspaceId}')/${propertyName}/$value`, {
+      headers: {
+        'Accept': 'text/plain; charset=utf-8'
+      }
+    });
+    return response.data;
+  }
+
   // Vault operations
   async getVaultEntries(params?: QueryParams): Promise<ArcVault[]> {
     const queryString = this.buildQueryString(params);
