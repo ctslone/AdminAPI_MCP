@@ -532,10 +532,13 @@ export function createConfigurationTools(client: ArcApiClient) {
           content: [{
             type: "text",
             text: `Found ${vaultEntries.length} vault entries:\n\n` +
-              vaultEntries.map(v => 
-                `🔐 **${v.Name || v.Id}** (${v.Id})\n` +
-                (v.Description ? `  Description: ${v.Description}\n` : '') +
-                `  Value: [SECURED]\n` // Never show actual values
+              vaultEntries.map(v =>
+                `**${v.name || v.Name || 'Unknown'}**\n` +
+                `  ID: ${v.id || v.Id || 'Unknown'}\n` +
+                `  Type: ${v.type || v.Type || 'Unknown'}\n` +
+                `  Show Type: ${v.showType || v.ShowType || 'Unknown'}\n` +
+                `  Tags: ${v.tags || v.Tags || 'None'}\n` +
+                `  Value: ${v.value || v.Value || 'Not set'}\n`
               ).join('\n')
           }]
         };
@@ -582,11 +585,12 @@ export function createConfigurationTools(client: ArcApiClient) {
         return {
           content: [{
             type: "text",
-            text: `🔐 **Vault Entry Created Successfully**\n\n` +
+            text: `**Vault Entry Created Successfully**\n\n` +
               `**ID:** ${entry.Id}\n` +
               `**Name:** ${entry.Name || 'N/A'}\n` +
-              `**Description:** ${entry.Description || 'N/A'}\n` +
-              `**Value:** [SECURED]`
+              `**Type:** ${entry.type || entry.Type || 'N/A'}\n` +
+              `**Tags:** ${entry.tags || entry.Tags || 'N/A'}\n` +
+              `**Value:** ${entry.value || entry.Value || 'Not set'}`
           }]
         };
       }
@@ -631,10 +635,11 @@ export function createConfigurationTools(client: ArcApiClient) {
         return {
           content: [{
             type: "text",
-            text: `🔐 **Vault Entry Updated Successfully**\n\n` +
+            text: `**Vault Entry Updated Successfully**\n\n` +
               `**ID:** ${entry.Id}\n` +
               `**Name:** ${entry.Name || 'N/A'}\n` +
-              `**Description:** ${entry.Description || 'N/A'}`
+              `**Type:** ${entry.Type || 'N/A'}\n` +
+              `**Tags:** ${entry.Tags || 'N/A'}`
           }]
         };
       }

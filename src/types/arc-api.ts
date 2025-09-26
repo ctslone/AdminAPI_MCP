@@ -37,11 +37,21 @@ export interface ArcFile {
 export interface ArcTransaction {
   Id: string;
   ConnectorId?: string;
+  WorkspaceId?: string;
+  Workspace?: string;
+  MessageId?: string;
+  Direction?: string;
   Status?: string;
-  StartTime?: string;
-  EndTime?: string;
-  MessageCount?: number;
-  ErrorMessage?: string;
+  Filename?: string;
+  FilePath?: string;
+  FileSize?: number;
+  Timestamp?: string;
+  ETag?: string;
+  InstanceId?: string;
+  BatchGroupId?: string;
+  IsBatchGroup?: boolean;
+  ProcessingTime?: number;
+  ConnectorType?: string;
 }
 
 export interface ArcLog {
@@ -72,8 +82,17 @@ export interface ArcWorkspace {
 export interface ArcVault {
   Id: string;
   Name?: string;
+  Type?: string;
+  ShowType?: string;
+  Tags?: string;
   Value?: string;
-  Description?: string;
+  // API also returns lowercase variants
+  id?: string;
+  name?: string;
+  type?: string;
+  showType?: string;
+  tags?: string;
+  value?: string;
 }
 
 export interface ArcCertificate {

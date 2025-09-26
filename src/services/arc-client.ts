@@ -162,6 +162,29 @@ export class ArcApiClient {
     }
   }
 
+  async deleteTransaction(id: string): Promise<void> {
+    await this.client.delete(`/transactions('${id}')`);
+  }
+
+  async getTransactionsCount(params?: QueryParams): Promise<number> {
+    const queryString = this.buildQueryString(params);
+    const response = await this.client.get<string>(`/transactions/$count${queryString}`, {
+      headers: {
+        'Accept': 'text/plain; charset=utf-8'
+      }
+    });
+    return parseInt(response.data) || 0;
+  }
+
+  async getTransactionProperty(id: string, propertyName: string): Promise<string> {
+    const response = await this.client.get<string>(`/transactions('${id}')/${propertyName}/$value`, {
+      headers: {
+        'Accept': 'text/plain; charset=utf-8'
+      }
+    });
+    return response.data;
+  }
+
   // Log operations
   async getLogs(params?: QueryParams): Promise<ArcLog[]> {
     const queryString = this.buildQueryString(params);
@@ -265,6 +288,25 @@ export class ArcApiClient {
 
   async deleteVaultEntry(id: string): Promise<void> {
     await this.client.delete(`/vault('${id}')`);
+  }
+
+  async getVaultCount(params?: QueryParams): Promise<number> {
+    const queryString = this.buildQueryString(params);
+    const response = await this.client.get<string>(`/vault/$count${queryString}`, {
+      headers: {
+        'Accept': 'text/plain; charset=utf-8'
+      }
+    });
+    return parseInt(response.data) || 0;
+  }
+
+  async getVaultProperty(id: string, propertyName: string): Promise<string> {
+    const response = await this.client.get<string>(`/vault('${id}')/${propertyName}/$value`, {
+      headers: {
+        'Accept': 'text/plain; charset=utf-8'
+      }
+    });
+    return response.data;
   }
 
   // Certificate operations

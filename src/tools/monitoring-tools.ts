@@ -30,6 +30,19 @@ const DeleteLogSchema = z.object({
   logId: z.string().min(1, "Log ID is required")
 });
 
+const DeleteTransactionSchema = z.object({
+  transactionId: z.string().min(1, "Transaction ID is required")
+});
+
+const GetTransactionsCountSchema = z.object({
+  filter: z.string().optional()
+});
+
+const GetTransactionPropertySchema = z.object({
+  transactionId: z.string().min(1, "Transaction ID is required"),
+  propertyName: z.string().min(1, "Property name is required")
+});
+
 function formatDate(dateString?: string): string {
   if (!dateString) return 'Unknown';
   try {
@@ -39,45 +52,44 @@ function formatDate(dateString?: string): string {
   }
 }
 
-function formatDuration(startTime?: string, endTime?: string): string {
-  if (!startTime || !endTime) return 'Unknown';
-  try {
-    const start = new Date(startTime);
-    const end = new Date(endTime);
-    const durationMs = end.getTime() - start.getTime();
-    
-    if (durationMs < 1000) {
-      return `${durationMs}ms`;
-    } else if (durationMs < 60000) {
-      return `${(durationMs / 1000).toFixed(2)}s`;
-    } else {
-      return `${(durationMs / 60000).toFixed(2)}m`;
-    }
-  } catch {
-    return 'Unknown';
+function getStatusIcon(status?: string): string {
+  if (!status) return 'UNKNOWN';
+
+  const statusLower = status.toLowerCase();
+  if (statusLower.includes('success') || statusLower.includes('complete')) return 'SUCCESS';
+  if (statusLower.includes('error') || statusLower.includes('fail')) return 'ERROR';
+  if (statusLower.includes('running') || statusLower.includes('process')) return 'RUNNING';
+  if (statusLower.includes('pending') || statusLower.includes('wait')) return 'PENDING';
+  return 'UNKNOWN';
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return '0 B';
+
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
+}
+
+function formatTime(timeMs: number): string {
+  if (timeMs < 1000) {
+    return `${timeMs}ms`;
+  } else if (timeMs < 60000) {
+    return `${(timeMs / 1000).toFixed(2)}s`;
+  } else {
+    return `${(timeMs / 60000).toFixed(2)}m`;
   }
 }
 
-function getStatusIcon(status?: string): string {
-  if (!status) return '❓';
-  
-  const statusLower = status.toLowerCase();
-  if (statusLower.includes('success') || statusLower.includes('complete')) return '✅';
-  if (statusLower.includes('error') || statusLower.includes('fail')) return '❌';
-  if (statusLower.includes('running') || statusLower.includes('process')) return '🔄';
-  if (statusLower.includes('pending') || statusLower.includes('wait')) return '⏳';
-  return '❓';
-}
-
 function getLogLevelIcon(level?: string): string {
-  if (!level) return '📄';
-  
+  if (!level) return 'LOG';
+
   const levelLower = level.toLowerCase();
-  if (levelLower.includes('error')) return '🔴';
-  if (levelLower.includes('warn')) return '🟡';
-  if (levelLower.includes('info')) return '🔵';
-  if (levelLower.includes('debug')) return '🔍';
-  return '📄';
+  if (levelLower.includes('error')) return 'ERROR';
+  if (levelLower.includes('warn')) return 'WARN';
+  if (levelLower.includes('info')) return 'INFO';
+  if (levelLower.includes('debug')) return 'DEBUG';
+  return 'LOG';
 }
 
 export function createMonitoringTools(client: ArcApiClient) {
@@ -140,10 +152,11 @@ export function createMonitoringTools(client: ArcApiClient) {
                 `${getStatusIcon(t.Status)} **Transaction ${t.Id}**\n` +
                 `  Connector: ${t.ConnectorId || 'Unknown'}\n` +
                 `  Status: ${t.Status || 'Unknown'}\n` +
-                `  Started: ${formatDate(t.StartTime)}\n` +
-                `  Duration: ${formatDuration(t.StartTime, t.EndTime)}\n` +
-                `  Messages: ${t.MessageCount || 0}\n` +
-                (t.ErrorMessage ? `  Error: ${t.ErrorMessage}\n` : '')
+                `  Timestamp: ${formatDate(t.Timestamp)}\n` +
+                `  Direction: ${t.Direction || 'Unknown'}\n` +
+                `  Filename: ${t.Filename || 'None'}\n` +
+                `  File Size: ${t.FileSize ? formatBytes(t.FileSize) : 'Unknown'}\n` +
+                `  Processing Time: ${t.ProcessingTime ? formatTime(t.ProcessingTime) : 'Unknown'}\n`
               ).join('\n')
           }]
         };
@@ -183,11 +196,15 @@ export function createMonitoringTools(client: ArcApiClient) {
               `**ID:** ${transaction.Id}\n` +
               `**Connector ID:** ${transaction.ConnectorId || 'Unknown'}\n` +
               `**Status:** ${transaction.Status || 'Unknown'}\n` +
-              `**Start Time:** ${formatDate(transaction.StartTime)}\n` +
-              `**End Time:** ${formatDate(transaction.EndTime)}\n` +
-              `**Duration:** ${formatDuration(transaction.StartTime, transaction.EndTime)}\n` +
-              `**Message Count:** ${transaction.MessageCount || 0}\n` +
-              (transaction.ErrorMessage ? `**Error Message:** ${transaction.ErrorMessage}\n` : '')
+              `**Timestamp:** ${formatDate(transaction.Timestamp)}\n` +
+              `**Direction:** ${transaction.Direction || 'Unknown'}\n` +
+              `**Filename:** ${transaction.Filename || 'None'}\n` +
+              `**File Path:** ${transaction.FilePath || 'Unknown'}\n` +
+              `**File Size:** ${transaction.FileSize ? formatBytes(transaction.FileSize) : 'Unknown'}\n` +
+              `**Processing Time:** ${transaction.ProcessingTime ? formatTime(transaction.ProcessingTime) : 'Unknown'}\n` +
+              `**Connector Type:** ${transaction.ConnectorType || 'Unknown'}\n` +
+              (transaction.BatchGroupId ? `**Batch Group ID:** ${transaction.BatchGroupId}\n` : '') +
+              (transaction.ETag ? `**ETag:** ${transaction.ETag}\n` : '')
           }]
         };
       }
@@ -217,8 +234,8 @@ export function createMonitoringTools(client: ArcApiClient) {
         const isoDate = cutoffDate.toISOString();
         
         const queryParams = {
-          $filter: `StartTime ge ${isoDate}`,
-          $orderby: 'StartTime DESC',
+          $filter: `Timestamp ge ${isoDate}`,
+          $orderby: 'Timestamp DESC',
           $top: top
         };
 
@@ -263,7 +280,7 @@ export function createMonitoringTools(client: ArcApiClient) {
           const transactions = connectorTransactions as any[];
           result += `**${connectorId}** (${transactions.length} transactions)\n`;
           transactions.slice(0, 3).forEach(t => {
-            result += `  ${getStatusIcon(t.Status)} ${t.Id} - ${formatDate(t.StartTime)}\n`;
+            result += `  ${getStatusIcon(t.Status)} ${t.Id} - ${formatDate(t.Timestamp)}\n`;
           });
           if (transactions.length > 3) {
             result += `  ... and ${transactions.length - 3} more\n`;
@@ -461,6 +478,105 @@ export function createMonitoringTools(client: ArcApiClient) {
             text: result
           }]
         };
+      }
+    },
+
+    {
+      name: "delete_transaction",
+      description: "Delete a specific transaction",
+      inputSchema: {
+        type: "object",
+        properties: {
+          transactionId: {
+            type: "string",
+            description: "The unique identifier of the transaction to delete"
+          }
+        },
+        required: ["transactionId"]
+      },
+      handler: async (args: any) => {
+        const validated = DeleteTransactionSchema.parse(args);
+
+        await client.deleteTransaction(validated.transactionId);
+
+        return {
+          content: [{
+            type: "text",
+            text: `**Transaction Deleted**\n\nTransaction '${validated.transactionId}' has been permanently deleted.`
+          }]
+        };
+      }
+    },
+
+    {
+      name: "get_transactions_count",
+      description: "Get the total count of transactions with optional filtering",
+      inputSchema: {
+        type: "object",
+        properties: {
+          filter: {
+            type: "string",
+            description: "OData filter expression to count specific transactions (e.g., \"Status eq 'Success'\")"
+          }
+        }
+      },
+      handler: async (args: any) => {
+        const validated = GetTransactionsCountSchema.parse(args);
+
+        const queryParams = validated.filter ? { $filter: validated.filter } : undefined;
+        const count = await client.getTransactionsCount(queryParams);
+
+        const filterText = validated.filter ? ` matching filter '${validated.filter}'` : '';
+
+        return {
+          content: [{
+            type: "text",
+            text: `**Transactions Count**\n\nTotal transactions${filterText}: **${count}**`
+          }]
+        };
+      }
+    },
+
+    {
+      name: "get_transaction_property",
+      description: "Get a specific property value from a transaction",
+      inputSchema: {
+        type: "object",
+        properties: {
+          transactionId: {
+            type: "string",
+            description: "The unique identifier of the transaction"
+          },
+          propertyName: {
+            type: "string",
+            description: "The name of the property to retrieve (e.g., 'Filename', 'Status', 'Direction')"
+          }
+        },
+        required: ["transactionId", "propertyName"]
+      },
+      handler: async (args: any) => {
+        const validated = GetTransactionPropertySchema.parse(args);
+
+        try {
+          const propertyValue = await client.getTransactionProperty(validated.transactionId, validated.propertyName);
+
+          return {
+            content: [{
+              type: "text",
+              text: `**Transaction Property**\n\n**Transaction ID:** ${validated.transactionId}\n**Property:** ${validated.propertyName}\n**Value:** ${propertyValue || 'null'}`
+            }]
+          };
+        } catch (error: any) {
+          if (error.response?.status === 404) {
+            return {
+              content: [{
+                type: "text",
+                text: `Transaction '${validated.transactionId}' or property '${validated.propertyName}' not found.`
+              }]
+            };
+          }
+          throw error;
+        }
       }
     },
 
