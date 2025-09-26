@@ -116,6 +116,21 @@ export interface ArcReport {
   TimePeriodEnd?: string;
 }
 
+export interface ArcRequest {
+  Id: string;
+  Timestamp?: string;
+  URL?: string;
+  Method?: string;
+  User?: string;
+  RemoteIP?: string;
+  Script?: string;
+  Bytes?: number;
+  Time?: number;
+  Error?: string;
+  status?: string;
+  InstanceId?: string;
+}
+
 // API response types
 export interface ApiResponse<T> {
   value?: T[];

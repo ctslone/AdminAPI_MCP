@@ -16,6 +16,7 @@ import { createMonitoringTools } from './tools/monitoring-tools.js';
 import { createConfigurationTools } from './tools/config-tools.js';
 import { createCertificateTools } from './tools/certificate-tools.js';
 import { createReportTools } from './tools/report-tools.js';
+import { createRequestTools } from './tools/request-tools.js';
 
 // Configuration from environment variables
 const CDATA_BASE_URL = process.env.CDATA_BASE_URL || 'http://localhost:8181/api.rsc';
@@ -64,7 +65,8 @@ function getTools(): any[] {
       ...createMonitoringTools(arcClient),
       ...createConfigurationTools(arcClient),
       ...createCertificateTools(arcClient),
-      ...createReportTools(arcClient)
+      ...createReportTools(arcClient),
+      ...createRequestTools(arcClient)
     ];
     
     console.error(`[MCP] Loaded ${allTools.length} tools successfully`);

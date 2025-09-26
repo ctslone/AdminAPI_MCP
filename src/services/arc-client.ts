@@ -9,6 +9,7 @@ import type {
   ArcVault,
   ArcCertificate,
   ArcReport,
+  ArcRequest,
   ApiResponse,
   QueryParams
 } from '../types/arc-api.js';
@@ -321,5 +322,36 @@ export class ArcApiClient {
 
   async deleteReport(name: string): Promise<void> {
     await this.client.delete(`/reports('${name}')`);
+  }
+
+  // Request operations
+  async getRequests(params?: QueryParams): Promise<ArcRequest[]> {
+    const queryString = this.buildQueryString(params);
+    const response = await this.client.get<ApiResponse<ArcRequest>>(`/requests${queryString}`);
+    return response.data.value || [];
+  }
+
+  async getRequest(id: string): Promise<ArcRequest | null> {
+    try {
+      const response = await this.client.get<ArcRequest>(`/requests('${id}')`);
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.status === 404) return null;
+      throw error;
+    }
+  }
+
+  async deleteRequest(id: string): Promise<void> {
+    await this.client.delete(`/requests('${id}')`);
+  }
+
+  async getRequestsCount(params?: QueryParams): Promise<number> {
+    const queryString = this.buildQueryString(params);
+    const response = await this.client.get<string>(`/requests/$count${queryString}`, {
+      headers: {
+        'Accept': 'text/plain; charset=utf-8'
+      }
+    });
+    return parseInt(response.data) || 0;
   }
 }
