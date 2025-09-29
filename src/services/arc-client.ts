@@ -30,6 +30,10 @@ import type {
   ImportResult,
   ReceiveFileInput,
   ReceiveFileResult,
+  SendFileInput,
+  SendFileResult,
+  SetFlowInput,
+  SetFlowResult,
   ApiResponse,
   QueryParams
 } from '../types/arc-api.js';
@@ -485,5 +489,15 @@ export class ArcApiClient {
   async receiveFile(input: ReceiveFileInput): Promise<ReceiveFileResult[]> {
     const response = await this.client.post<ApiResponse<ReceiveFileResult>>('/receiveFile', input);
     return response.data.value || [];
+  }
+
+  async sendFile(input: SendFileInput): Promise<SendFileResult[]> {
+    const response = await this.client.post<ApiResponse<SendFileResult>>('/sendFile', input);
+    return response.data.value || [];
+  }
+
+  async setFlow(input: SetFlowInput): Promise<void> {
+    const response = await this.client.post<ApiResponse<SetFlowResult>>('/setFlow', input);
+    // Returns empty value array on success
   }
 }

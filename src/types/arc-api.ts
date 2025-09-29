@@ -357,6 +357,41 @@ export interface ReceiveFileResult {
   ErrorMessage?: string;
 }
 
+export interface SendFileInput {
+  WorkspaceId?: string;
+  ConnectorId: string;
+  PortId?: string;
+  MessageId?: string;
+  File?: string;
+  Subfolder?: string;
+  'Attachment#'?: string;
+  FormatResult?: string;
+}
+
+export interface SendFileResult {
+  MessageId?: string;
+  File?: string;
+}
+
+export interface FlowConnection {
+  dest?: string;
+  output?: string;
+}
+
+export interface FlowConnector {
+  ConnectorId: string;
+  Connections: (string | FlowConnection)[];
+}
+
+export interface SetFlowInput {
+  WorkspaceId: string;
+  Value: FlowConnector[];
+}
+
+export interface SetFlowResult {
+  // Empty response - just success indication
+}
+
 // API response types
 export interface ApiResponse<T> {
   value?: T[];

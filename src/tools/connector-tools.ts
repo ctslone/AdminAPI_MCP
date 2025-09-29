@@ -83,6 +83,20 @@ const SendFileSchema = z.object({
   formatResult: z.string().optional()
 });
 
+const SetFlowSchema = z.object({
+  workspaceId: z.string().min(1, "Workspace ID is required"),
+  connections: z.array(z.object({
+    connectorId: z.string().min(1, "Connector ID is required"),
+    connections: z.array(z.union([
+      z.string(), // Simple string connection
+      z.object({  // Complex connection object
+        dest: z.string().optional(),
+        output: z.string().optional()
+      })
+    ]))
+  })).min(1, "At least one connector connection is required")
+});
+
 export function createConnectorTools(client: ArcApiClient) {
   return [
     {
@@ -723,6 +737,113 @@ export function createConnectorTools(client: ArcApiClient) {
             errorMessage = `**Send Operation Failed**\n\n` +
               `**Connector:** ${validated.connectorId}\n` +
               (validated.workspaceId ? `**Workspace:** ${validated.workspaceId}\n` : '') +
+              `**Error Code:** ${apiError.code || 'Unknown'}\n` +
+              `**Error Message:** ${apiError.message || 'No details provided'}`;
+          }
+
+          return {
+            content: [{
+              type: "text",
+              text: errorMessage
+            }],
+            isError: true
+          };
+        }
+      }
+    },
+
+    {
+      name: 'set_flow',
+      description: 'Configure connector flow connections within a workspace',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          workspaceId: {
+            type: 'string',
+            description: 'The workspace ID where the flow connections will be configured'
+          },
+          connections: {
+            type: 'array',
+            description: 'Array of connector flow configurations',
+            items: {
+              type: 'object',
+              properties: {
+                connectorId: {
+                  type: 'string',
+                  description: 'The source connector ID'
+                },
+                connections: {
+                  type: 'array',
+                  description: 'Array of destination connections (strings or objects with dest/output properties)',
+                  items: {
+                    oneOf: [
+                      {
+                        type: 'string',
+                        description: 'Simple destination connector ID'
+                      },
+                      {
+                        type: 'object',
+                        properties: {
+                          dest: {
+                            type: 'string',
+                            description: 'Destination connector ID'
+                          },
+                          output: {
+                            type: 'string',
+                            description: 'Output name for the connection'
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              required: ['connectorId', 'connections']
+            }
+          }
+        },
+        required: ['workspaceId', 'connections']
+      },
+      handler: async (args: any) => {
+        try {
+          const validated = SetFlowSchema.parse(args);
+
+          const setFlowInput = {
+            WorkspaceId: validated.workspaceId,
+            Value: validated.connections.map(conn => ({
+              ConnectorId: conn.connectorId,
+              Connections: conn.connections
+            }))
+          };
+
+          await client.setFlow(setFlowInput);
+
+          let responseText = `**Flow Configuration Updated Successfully**\n\n` +
+            `**Workspace:** ${validated.workspaceId}\n` +
+            `**Connectors Configured:** ${validated.connections.length}\n\n`;
+
+          responseText += `**Flow Connections:**\n`;
+          validated.connections.forEach(conn => {
+            responseText += `• **${conn.connectorId}** → `;
+            const connectionList = conn.connections.map(c =>
+              typeof c === 'string' ? c : `${c.dest || 'N/A'}${c.output ? ` (${c.output})` : ''}`
+            ).join(', ');
+            responseText += `${connectionList}\n`;
+          });
+
+          return {
+            content: [{
+              type: "text",
+              text: responseText
+            }]
+          };
+        } catch (error: any) {
+          let errorMessage = `Error configuring flow: ${error.message}`;
+
+          if (error.response?.data?.error) {
+            const apiError = error.response.data.error;
+            errorMessage = `**Flow Configuration Failed**\n\n` +
+              `**Workspace:** ${args.workspaceId || 'N/A'}\n` +
               `**Error Code:** ${apiError.code || 'Unknown'}\n` +
               `**Error Message:** ${apiError.message || 'No details provided'}`;
           }
