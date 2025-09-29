@@ -243,6 +243,28 @@ export interface CopyWorkspaceResult {
   Count?: string;
 }
 
+export interface CreateCertInput {
+  Filename: string;
+  CommonName: string;
+  Serialnumber: string;
+  Password: string;
+  Country?: string;
+  Email?: string;
+  Expiration?: string;
+  KeySize?: string;
+  PublicKeyType?: string;
+  SignatureAlgorithm?: string;
+  Locality?: string;
+  Organization?: string;
+  OrganizationalUnit?: string;
+  State?: string;
+}
+
+export interface CreateCertResult {
+  Name?: string;
+  Password?: string;
+}
+
 // API response types
 export interface ApiResponse<T> {
   value?: T[];

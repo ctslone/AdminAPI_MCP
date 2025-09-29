@@ -36,6 +36,23 @@ const DeleteCertificateSchema = z.object({
   name: z.string().min(1, "Certificate name is required")
 });
 
+const CreateCertSchema = z.object({
+  filename: z.string().min(1, "Filename is required"),
+  commonName: z.string().min(1, "Common name is required"),
+  serialnumber: z.string().min(1, "Serial number is required"),
+  password: z.string().min(1, "Password is required"),
+  country: z.string().optional(),
+  email: z.string().optional(),
+  expiration: z.string().optional(),
+  keySize: z.string().optional(),
+  publicKeyType: z.string().optional(),
+  signatureAlgorithm: z.string().optional(),
+  locality: z.string().optional(),
+  organization: z.string().optional(),
+  organizationalUnit: z.string().optional(),
+  state: z.string().optional()
+});
+
 export function createCertificateTools(client: ArcApiClient) {
   return [
     {
@@ -277,6 +294,121 @@ export function createCertificateTools(client: ArcApiClient) {
           content: [{
             type: "text",
             text: `🗑️ **Certificate Deleted**\n\nCertificate '${validated.name}' has been permanently deleted.`
+          }]
+        };
+      }
+    },
+
+    {
+      name: "create_cert",
+      description: "Create a public/private certificate key pair with specified parameters",
+      inputSchema: {
+        type: "object",
+        properties: {
+          filename: {
+            type: "string",
+            description: "The certificate filename"
+          },
+          commonName: {
+            type: "string",
+            description: "The common name for the certificate"
+          },
+          serialnumber: {
+            type: "string",
+            description: "The serial number for the certificate"
+          },
+          password: {
+            type: "string",
+            description: "The password to protect the private key"
+          },
+          country: {
+            type: "string",
+            description: "The country"
+          },
+          email: {
+            type: "string",
+            description: "Email address"
+          },
+          expiration: {
+            type: "string",
+            description: "Expiration in years (default: 1)"
+          },
+          keySize: {
+            type: "string",
+            description: "The key size (default: 2048)"
+          },
+          publicKeyType: {
+            type: "string",
+            description: "The public key type (default: X.509)"
+          },
+          signatureAlgorithm: {
+            type: "string",
+            description: "The signature algorithm (default: SHA256)"
+          },
+          locality: {
+            type: "string",
+            description: "The locality/city"
+          },
+          organization: {
+            type: "string",
+            description: "The organization name"
+          },
+          organizationalUnit: {
+            type: "string",
+            description: "The organizational unit"
+          },
+          state: {
+            type: "string",
+            description: "The state/province"
+          }
+        },
+        required: ["filename", "commonName", "serialnumber", "password"]
+      },
+      handler: async (args: any) => {
+        const validated = CreateCertSchema.parse(args);
+
+        const certInput = {
+          Filename: validated.filename,
+          CommonName: validated.commonName,
+          Serialnumber: validated.serialnumber,
+          Password: validated.password,
+          Country: validated.country,
+          Email: validated.email,
+          Expiration: validated.expiration,
+          KeySize: validated.keySize,
+          PublicKeyType: validated.publicKeyType,
+          SignatureAlgorithm: validated.signatureAlgorithm,
+          Locality: validated.locality,
+          Organization: validated.organization,
+          OrganizationalUnit: validated.organizationalUnit,
+          State: validated.state
+        };
+
+        const result = await client.createCert(certInput);
+
+        let responseText = `**Certificate Created Successfully**\n\n` +
+          `**Filename:** ${validated.filename}\n` +
+          `**Common Name:** ${validated.commonName}\n` +
+          `**Serial Number:** ${validated.serialnumber}`;
+
+        if (result && result.length > 0) {
+          if (result[0].Name) {
+            responseText += `\n**Created File:** ${result[0].Name}`;
+          }
+          if (result[0].Password) {
+            responseText += `\n**Password:** ${result[0].Password}`;
+          }
+        }
+
+        // Add configuration details
+        if (validated.expiration) responseText += `\n**Expiration:** ${validated.expiration} years`;
+        if (validated.keySize) responseText += `\n**Key Size:** ${validated.keySize}`;
+        if (validated.signatureAlgorithm) responseText += `\n**Signature Algorithm:** ${validated.signatureAlgorithm}`;
+
+        return {
+          content: [{
+            type: "text",
+            text: responseText
           }]
         };
       }
