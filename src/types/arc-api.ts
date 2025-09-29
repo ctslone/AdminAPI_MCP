@@ -297,6 +297,17 @@ export interface ExportResult {
   Arcflow?: string;
 }
 
+export interface GetMessageCountInput {
+  WorkspaceId?: string;
+  ConnectorId?: string;
+}
+
+export interface GetMessageCountResult {
+  ConnectorId?: string;
+  Count?: string;
+  Workspace?: string;
+}
+
 // API response types
 export interface ApiResponse<T> {
   value?: T[];

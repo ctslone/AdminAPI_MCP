@@ -22,6 +22,8 @@ import type {
   ExchangeCertResult,
   ExportInput,
   ExportResult,
+  GetMessageCountInput,
+  GetMessageCountResult,
   ApiResponse,
   QueryParams
 } from '../types/arc-api.js';
@@ -457,5 +459,10 @@ export class ArcApiClient {
   async export(input: ExportInput): Promise<ExportResult[]> {
     const response = await this.client.post<ExportResult[]>('/export', input);
     return response.data;
+  }
+
+  async getMessageCount(input: GetMessageCountInput): Promise<GetMessageCountResult[]> {
+    const response = await this.client.post<ApiResponse<GetMessageCountResult>>('/getMessageCount', input);
+    return response.data.value || [];
   }
 }

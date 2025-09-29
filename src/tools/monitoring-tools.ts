@@ -43,6 +43,11 @@ const GetTransactionPropertySchema = z.object({
   propertyName: z.string().min(1, "Property name is required")
 });
 
+const GetMessageCountSchema = z.object({
+  workspaceId: z.string().optional(),
+  connectorId: z.string().optional()
+});
+
 function formatDate(dateString?: string): string {
   if (!dateString) return 'Unknown';
   try {
@@ -602,6 +607,75 @@ export function createMonitoringTools(client: ArcApiClient) {
           content: [{
             type: "text",
             text: `**Log Deleted**\n\nLog entry '${validated.logId}' has been permanently deleted.`
+          }]
+        };
+      }
+    },
+
+    {
+      name: "get_message_count",
+      description: "Get the unsent messages count for connectors - counts all messages in Send folders",
+      inputSchema: {
+        type: "object",
+        properties: {
+          workspaceId: {
+            type: "string",
+            description: "The workspace ID to filter by. If not specified, returns counts for all workspaces"
+          },
+          connectorId: {
+            type: "string",
+            description: "The connector ID to filter by. If not specified, returns counts for all connectors"
+          }
+        }
+      },
+      handler: async (args: any) => {
+        const validated = GetMessageCountSchema.parse(args);
+
+        const messageCountInput = {
+          WorkspaceId: validated.workspaceId,
+          ConnectorId: validated.connectorId
+        };
+
+        const results = await client.getMessageCount(messageCountInput);
+
+        if (!results || results.length === 0) {
+          return {
+            content: [{
+              type: "text",
+              text: "**No Message Counts Found**\n\nNo connectors found matching the specified criteria."
+            }]
+          };
+        }
+
+        // Build summary
+        const totalMessages = results.reduce((sum, result) => {
+          const count = parseInt(result.Count || '0');
+          return sum + count;
+        }, 0);
+
+        let responseText = `**Message Count Summary**\n\n` +
+          `**Total Unsent Messages:** ${totalMessages}\n` +
+          `**Connectors Checked:** ${results.length}\n\n`;
+
+        // Add details for each connector
+        responseText += "**Per Connector:**\n";
+        results.forEach(result => {
+          const count = result.Count || '0';
+          const workspace = result.Workspace || 'Unknown';
+          responseText += `• **${result.ConnectorId}** (${workspace}): ${count} messages\n`;
+        });
+
+        // Add filter information
+        if (validated.workspaceId || validated.connectorId) {
+          responseText += "\n**Filters Applied:**\n";
+          if (validated.workspaceId) responseText += `• Workspace: ${validated.workspaceId}\n`;
+          if (validated.connectorId) responseText += `• Connector: ${validated.connectorId}\n`;
+        }
+
+        return {
+          content: [{
+            type: "text",
+            text: responseText
           }]
         };
       }
