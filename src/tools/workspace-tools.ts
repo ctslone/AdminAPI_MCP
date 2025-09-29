@@ -2,6 +2,12 @@ import { z } from 'zod';
 import type { ArcApiClient } from '../services/arc-client.js';
 import type { ArcWorkspace } from '../types/arc-api.js';
 
+const CopyWorkspaceSchema = z.object({
+  workspaceId: z.string().min(1, "Workspace ID is required"),
+  newWorkspaceId: z.string().min(1, "New workspace ID is required"),
+  connectorIdSuffix: z.string().min(1, "Connector ID suffix is required")
+});
+
 export function createWorkspaceTools(client: ArcApiClient) {
   return [
     {
@@ -460,6 +466,66 @@ export function createWorkspaceTools(client: ArcApiClient) {
             content: [{
               type: "text",
               text: `Error searching workspaces: ${error.message}`
+            }],
+            isError: true
+          };
+        }
+      }
+    },
+
+    {
+      name: 'copy_workspace',
+      description: 'Copy all connectors from a source workspace to a new workspace with a specified suffix added to connector IDs',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          workspaceId: {
+            type: 'string',
+            description: 'The ID of the source workspace to copy from'
+          },
+          newWorkspaceId: {
+            type: 'string',
+            description: 'The ID of the new workspace to create'
+          },
+          connectorIdSuffix: {
+            type: 'string',
+            description: 'Suffix to add to all copied connector IDs to ensure uniqueness'
+          }
+        },
+        required: ['workspaceId', 'newWorkspaceId', 'connectorIdSuffix']
+      },
+      handler: async (args: any) => {
+        try {
+          const validated = CopyWorkspaceSchema.parse(args);
+
+          const copyInput = {
+            WorkspaceId: validated.workspaceId,
+            NewWorkspaceId: validated.newWorkspaceId,
+            ConnectorIdSuffix: validated.connectorIdSuffix
+          };
+
+          const result = await client.copyWorkspace(copyInput);
+
+          let responseText = `**Workspace Copied Successfully**\n\n` +
+            `**Source Workspace:** ${validated.workspaceId}\n` +
+            `**New Workspace:** ${validated.newWorkspaceId}\n` +
+            `**Connector Suffix:** ${validated.connectorIdSuffix}`;
+
+          if (result && result.length > 0 && result[0].Count) {
+            responseText += `\n**Connectors Copied:** ${result[0].Count}`;
+          }
+
+          return {
+            content: [{
+              type: "text",
+              text: responseText
+            }]
+          };
+        } catch (error: any) {
+          return {
+            content: [{
+              type: "text",
+              text: `Error copying workspace: ${error.message}`
             }],
             isError: true
           };

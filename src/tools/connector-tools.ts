@@ -60,6 +60,13 @@ const DeleteConnectorSchema = z.object({
   connectorId: z.string().min(1, "Connector ID is required")
 });
 
+const CopyConnectorSchema = z.object({
+  workspaceId: z.string().min(1, "Workspace ID is required"),
+  connectorId: z.string().min(1, "Connector ID is required"),
+  newConnectorId: z.string().min(1, "New connector ID is required"),
+  newWorkspaceId: z.string().optional()
+});
+
 export function createConnectorTools(client: ArcApiClient) {
   return [
     {
@@ -417,7 +424,7 @@ export function createConnectorTools(client: ArcApiClient) {
       name: "delete_connector",
       description: "Delete an Arc connector permanently",
       inputSchema: {
-        type: "object", 
+        type: "object",
         properties: {
           connectorId: {
             type: "string",
@@ -428,13 +435,68 @@ export function createConnectorTools(client: ArcApiClient) {
       },
       handler: async (args: any) => {
         const validated = DeleteConnectorSchema.parse(args);
-        
+
         await client.deleteConnector(validated.connectorId);
-        
+
         return {
           content: [{
             type: "text",
             text: `**Connector Deleted**\n\nConnector '${validated.connectorId}' has been permanently deleted.`
+          }]
+        };
+      }
+    },
+
+    {
+      name: "copy_connector",
+      description: "Copy an Arc connector settings to a new connector with a specified ID. Optionally copy to a different workspace.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          workspaceId: {
+            type: "string",
+            description: "The ID of the workspace containing the source connector"
+          },
+          connectorId: {
+            type: "string",
+            description: "The ID of the connector to copy"
+          },
+          newConnectorId: {
+            type: "string",
+            description: "The ID for the new connector"
+          },
+          newWorkspaceId: {
+            type: "string",
+            description: "The ID of the destination workspace. If not specified, the new connector will be created in the same workspace as the source connector"
+          }
+        },
+        required: ["workspaceId", "connectorId", "newConnectorId"]
+      },
+      handler: async (args: any) => {
+        const validated = CopyConnectorSchema.parse(args);
+
+        const copyInput = {
+          WorkspaceId: validated.workspaceId,
+          ConnectorId: validated.connectorId,
+          NewConnectorId: validated.newConnectorId,
+          NewWorkspaceId: validated.newWorkspaceId
+        };
+
+        const result = await client.copyConnector(copyInput);
+
+        const targetWorkspace = validated.newWorkspaceId || validated.workspaceId;
+        let responseText = `**Connector Copied Successfully**\n\n` +
+          `**Source:** ${validated.connectorId} (workspace: ${validated.workspaceId})\n` +
+          `**Destination:** ${validated.newConnectorId} (workspace: ${targetWorkspace})`;
+
+        if (result && result.length > 0 && result[0].AllowedPrivileges) {
+          responseText += `\n**Privileges:** ${result[0].AllowedPrivileges}`;
+        }
+
+        return {
+          content: [{
+            type: "text",
+            text: responseText
           }]
         };
       }

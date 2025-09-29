@@ -12,6 +12,10 @@ import type {
   ArcRequest,
   CleanupInput,
   CleanupResult,
+  CopyConnectorInput,
+  CopyConnectorResult,
+  CopyWorkspaceInput,
+  CopyWorkspaceResult,
   ApiResponse,
   QueryParams
 } from '../types/arc-api.js';
@@ -421,6 +425,16 @@ export class ArcApiClient {
   // Action operations
   async cleanup(input: CleanupInput): Promise<CleanupResult> {
     const response = await this.client.post<CleanupResult>('/cleanup', input);
+    return response.data;
+  }
+
+  async copyConnector(input: CopyConnectorInput): Promise<CopyConnectorResult[]> {
+    const response = await this.client.post<CopyConnectorResult[]>('/copyConnector', input);
+    return response.data;
+  }
+
+  async copyWorkspace(input: CopyWorkspaceInput): Promise<CopyWorkspaceResult[]> {
+    const response = await this.client.post<CopyWorkspaceResult[]>('/copyWorkspace', input);
     return response.data;
   }
 }

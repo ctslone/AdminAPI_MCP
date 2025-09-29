@@ -222,6 +222,27 @@ export interface CleanupResult {
   [key: string]: any; // Allow additional properties in response
 }
 
+export interface CopyConnectorInput {
+  WorkspaceId: string;
+  ConnectorId: string;
+  NewConnectorId: string;
+  NewWorkspaceId?: string;
+}
+
+export interface CopyConnectorResult {
+  AllowedPrivileges?: string;
+}
+
+export interface CopyWorkspaceInput {
+  WorkspaceId: string;
+  NewWorkspaceId: string;
+  ConnectorIdSuffix: string;
+}
+
+export interface CopyWorkspaceResult {
+  Count?: string;
+}
+
 // API response types
 export interface ApiResponse<T> {
   value?: T[];
