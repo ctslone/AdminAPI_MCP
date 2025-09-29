@@ -12,6 +12,18 @@ const ExportSchema = z.object({
   profileSettings: z.string().optional()
 });
 
+const ImportSchema = z.object({
+  arcflow: z.string().min(1, "Arcflow data is required"),
+  duplicateAction: z.string().optional(),
+  overwrite: z.string().optional(),
+  workspaceId: z.string().optional(),
+  inputName: z.string().optional(),
+  dataDirectory: z.string().optional(),
+  decryptPassword: z.string().optional(),
+  globalSettings: z.string().optional(),
+  profileSettings: z.string().optional()
+});
+
 export function createActionTools(client: ArcApiClient) {
   return [
     {
@@ -181,6 +193,106 @@ export function createActionTools(client: ArcApiClient) {
             content: [{
               type: "text",
               text: `Error during export operation: ${error.message}`
+            }],
+            isError: true
+          };
+        }
+      }
+    },
+
+    {
+      name: 'import_settings',
+      description: 'Import partner/connector profiles from arcflow data (base64 encoded)',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          arcflow: {
+            type: 'string',
+            description: 'Base64 encoded string containing the zip data for the arcflow (required)'
+          },
+          duplicateAction: {
+            type: 'string',
+            description: 'How to handle duplicates: "Overwrite", "Rename", or "Skip"'
+          },
+          overwrite: {
+            type: 'string',
+            description: 'Whether to overwrite duplicated sources (True/False, default: False)'
+          },
+          workspaceId: {
+            type: 'string',
+            description: 'The workspace to import into. If unspecified, auto-detects or uses default workspace'
+          },
+          inputName: {
+            type: 'string',
+            description: 'The name of the form input when uploading files from a form'
+          },
+          dataDirectory: {
+            type: 'string',
+            description: 'The data directory or zipped file where profiles are stored'
+          },
+          decryptPassword: {
+            type: 'string',
+            description: 'The password for decrypting sensitive values'
+          },
+          globalSettings: {
+            type: 'string',
+            description: 'Global settings to import. Comma-separated values or "ALL". Values: Partners, Documents, Users, Roles, Certificates, Connections, Vaults, Reports, Alerts, Advanced, AdminAPI, SSO'
+          },
+          profileSettings: {
+            type: 'string',
+            description: 'Profiles to import. Comma-separated values or "ALL". Values: AS2, AS4, GISB, RosettaNet, FTPServer, SFTPServer, HL7MLLP, OFTP'
+          }
+        },
+        required: ['arcflow']
+      },
+      handler: async (args: any) => {
+        try {
+          const validated = ImportSchema.parse(args);
+
+          const importInput = {
+            Arcflow: validated.arcflow,
+            DuplicateAction: validated.duplicateAction,
+            Overwrite: validated.overwrite || "False",
+            WorkspaceId: validated.workspaceId,
+            InputName: validated.inputName,
+            DataDirectory: validated.dataDirectory,
+            DecryptPassword: validated.decryptPassword,
+            GlobalSettings: validated.globalSettings,
+            ProfileSettings: validated.profileSettings
+          };
+
+          const result = await client.import(importInput);
+
+          let responseText = `**Import Completed Successfully**`;
+
+          // Add import parameters
+          if (validated.workspaceId) responseText += `\n**Target Workspace:** ${validated.workspaceId}`;
+          if (validated.duplicateAction) responseText += `\n**Duplicate Action:** ${validated.duplicateAction}`;
+          if (validated.overwrite) responseText += `\n**Overwrite:** ${validated.overwrite}`;
+          if (validated.globalSettings) responseText += `\n**Global Settings:** ${validated.globalSettings}`;
+          if (validated.profileSettings) responseText += `\n**Profile Settings:** ${validated.profileSettings}`;
+
+          const arcflowSize = validated.arcflow.length;
+          responseText += `\n\n**Arcflow Data:** Base64 encoded (${arcflowSize} characters)`;
+          responseText += `\n**Preview:** ${validated.arcflow.substring(0, 100)}...`;
+
+          // Add result details if available
+          if (result) {
+            if (result.message) responseText += `\n\n**Result:** ${result.message}`;
+            if (result.success !== undefined) responseText += `\n**Status:** ${result.success ? 'Success' : 'Failed'}`;
+          }
+
+          return {
+            content: [{
+              type: "text",
+              text: responseText
+            }]
+          };
+        } catch (error: any) {
+          return {
+            content: [{
+              type: "text",
+              text: `Error during import operation: ${error.message}`
             }],
             isError: true
           };

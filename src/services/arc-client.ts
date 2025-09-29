@@ -26,6 +26,8 @@ import type {
   GetMessageCountResult,
   GetTransactionLogsInput,
   GetTransactionLogsResult,
+  ImportInput,
+  ImportResult,
   ApiResponse,
   QueryParams
 } from '../types/arc-api.js';
@@ -470,6 +472,11 @@ export class ArcApiClient {
 
   async getTransactionLogs(input: GetTransactionLogsInput): Promise<GetTransactionLogsResult[]> {
     const response = await this.client.post<GetTransactionLogsResult[]>('/getTransactionLogs', input);
+    return response.data;
+  }
+
+  async import(input: ImportInput): Promise<ImportResult> {
+    const response = await this.client.post<ImportResult>('/import', input);
     return response.data;
   }
 }

@@ -326,6 +326,24 @@ export interface GetTransactionLogsResult {
   Content?: string;
 }
 
+export interface ImportInput {
+  Arcflow: string;
+  DuplicateAction?: string;
+  Overwrite?: string;
+  WorkspaceId?: string;
+  InputName?: string;
+  DataDirectory?: string;
+  DecryptPassword?: string;
+  GlobalSettings?: string;
+  ProfileSettings?: string;
+}
+
+export interface ImportResult {
+  message?: string;
+  success?: boolean;
+  [key: string]: any; // Allow additional properties in response
+}
+
 // API response types
 export interface ApiResponse<T> {
   value?: T[];
