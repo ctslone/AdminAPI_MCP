@@ -18,6 +18,8 @@ import type {
   CopyWorkspaceResult,
   CreateCertInput,
   CreateCertResult,
+  ExchangeCertInput,
+  ExchangeCertResult,
   ApiResponse,
   QueryParams
 } from '../types/arc-api.js';
@@ -442,6 +444,11 @@ export class ArcApiClient {
 
   async createCert(input: CreateCertInput): Promise<CreateCertResult[]> {
     const response = await this.client.post<CreateCertResult[]>('/createCert', input);
+    return response.data;
+  }
+
+  async exchangeCert(input: ExchangeCertInput): Promise<ExchangeCertResult> {
+    const response = await this.client.post<ExchangeCertResult>('/exchangeCert', input);
     return response.data;
   }
 }

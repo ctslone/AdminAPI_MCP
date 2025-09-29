@@ -53,6 +53,18 @@ const CreateCertSchema = z.object({
   state: z.string().optional()
 });
 
+const ExchangeCertSchema = z.object({
+  workspaceId: z.string().optional(),
+  connectorId: z.string().optional(),
+  portId: z.string().optional(),
+  certificate: z.string().min(1, "Certificate is required"),
+  exchangeType: z.string().min(1, "Exchange type is required"),
+  certificatePassword: z.string().optional(),
+  certificateUsage: z.string().optional(),
+  responseURL: z.string().optional(),
+  requestId: z.string().optional()
+});
+
 export function createCertificateTools(client: ArcApiClient) {
   return [
     {
@@ -404,6 +416,93 @@ export function createCertificateTools(client: ArcApiClient) {
         if (validated.expiration) responseText += `\n**Expiration:** ${validated.expiration} years`;
         if (validated.keySize) responseText += `\n**Key Size:** ${validated.keySize}`;
         if (validated.signatureAlgorithm) responseText += `\n**Signature Algorithm:** ${validated.signatureAlgorithm}`;
+
+        return {
+          content: [{
+            type: "text",
+            text: responseText
+          }]
+        };
+      }
+    },
+
+    {
+      name: "exchange_cert",
+      description: "Exchange the specified certificate for AS2 or OFTP protocols",
+      inputSchema: {
+        type: "object",
+        properties: {
+          workspaceId: {
+            type: "string",
+            description: "The workspace ID"
+          },
+          connectorId: {
+            type: "string",
+            description: "The connector ID"
+          },
+          portId: {
+            type: "string",
+            description: "The port ID"
+          },
+          certificate: {
+            type: "string",
+            description: "The certificate to exchange"
+          },
+          exchangeType: {
+            type: "string",
+            description: "The exchange type. Valid values: AS2(Request, Response), OFTP(Deliver, Request, Replace)"
+          },
+          certificatePassword: {
+            type: "string",
+            description: "The password of certificate (for AS2)"
+          },
+          certificateUsage: {
+            type: "string",
+            description: "The cryptographic function(s) for the certificate. Valid values: 'Encryption,Verification,ServerTLS,ClientTLS' (for AS2)"
+          },
+          responseURL: {
+            type: "string",
+            description: "The URL which the response should be sent (for AS2)"
+          },
+          requestId: {
+            type: "string",
+            description: "The Request ID (for AS2)"
+          }
+        },
+        required: ["certificate", "exchangeType"]
+      },
+      handler: async (args: any) => {
+        const validated = ExchangeCertSchema.parse(args);
+
+        const exchangeInput = {
+          WorkspaceId: validated.workspaceId,
+          ConnectorId: validated.connectorId,
+          PortId: validated.portId,
+          Certificate: validated.certificate,
+          ExchangeType: validated.exchangeType,
+          CertificatePassword: validated.certificatePassword,
+          CertificateUsage: validated.certificateUsage,
+          ResponseURL: validated.responseURL,
+          RequestId: validated.requestId
+        };
+
+        const result = await client.exchangeCert(exchangeInput);
+
+        let responseText = `**Certificate Exchange Initiated**\n\n` +
+          `**Exchange Type:** ${validated.exchangeType}`;
+
+        if (validated.workspaceId) responseText += `\n**Workspace:** ${validated.workspaceId}`;
+        if (validated.connectorId) responseText += `\n**Connector:** ${validated.connectorId}`;
+        if (validated.portId) responseText += `\n**Port:** ${validated.portId}`;
+        if (validated.certificateUsage) responseText += `\n**Usage:** ${validated.certificateUsage}`;
+        if (validated.responseURL) responseText += `\n**Response URL:** ${validated.responseURL}`;
+        if (validated.requestId) responseText += `\n**Request ID:** ${validated.requestId}`;
+
+        // Add result details if available
+        if (result) {
+          if (result.message) responseText += `\n\n**Result:** ${result.message}`;
+          if (result.success !== undefined) responseText += `\n**Status:** ${result.success ? 'Success' : 'Failed'}`;
+        }
 
         return {
           content: [{

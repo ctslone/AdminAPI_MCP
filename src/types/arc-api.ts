@@ -265,6 +265,24 @@ export interface CreateCertResult {
   Password?: string;
 }
 
+export interface ExchangeCertInput {
+  WorkspaceId?: string;
+  ConnectorId?: string;
+  PortId?: string;
+  Certificate: string;
+  ExchangeType: string;
+  CertificatePassword?: string;
+  CertificateUsage?: string;
+  ResponseURL?: string;
+  RequestId?: string;
+}
+
+export interface ExchangeCertResult {
+  message?: string;
+  success?: boolean;
+  [key: string]: any; // Allow additional properties in response
+}
+
 // API response types
 export interface ApiResponse<T> {
   value?: T[];
