@@ -72,6 +72,17 @@ const ReceiveFileSchema = z.object({
   connectorId: z.string().min(1, "Connector ID is required")
 });
 
+const SendFileSchema = z.object({
+  workspaceId: z.string().optional(),
+  connectorId: z.string().min(1, "Connector ID is required"),
+  portId: z.string().optional(),
+  messageId: z.string().optional(),
+  file: z.string().optional(),
+  subfolder: z.string().optional(),
+  attachment: z.string().optional(),
+  formatResult: z.string().optional()
+});
+
 export function createConnectorTools(client: ArcApiClient) {
   return [
     {
@@ -593,6 +604,137 @@ export function createConnectorTools(client: ArcApiClient) {
             text: responseText
           }]
         };
+      }
+    },
+
+    {
+      name: "send_file",
+      description: "Trigger the send action of a connector to upload/send files from the send folder",
+      inputSchema: {
+        type: "object",
+        properties: {
+          workspaceId: {
+            type: "string",
+            description: "The workspace ID of the connector"
+          },
+          connectorId: {
+            type: "string",
+            description: "The connector ID (required) - triggers the send action for this connector"
+          },
+          portId: {
+            type: "string",
+            description: "The port ID"
+          },
+          messageId: {
+            type: "string",
+            description: "The message ID"
+          },
+          file: {
+            type: "string",
+            description: "The specific file name to send"
+          },
+          subfolder: {
+            type: "string",
+            description: "The subfolder of the file"
+          },
+          attachment: {
+            type: "string",
+            description: "The attachment file"
+          },
+          formatResult: {
+            type: "string",
+            description: "Whether to format the result"
+          }
+        },
+        required: ["connectorId"]
+      },
+      handler: async (args: any) => {
+        const validated = SendFileSchema.parse(args);
+
+        const sendInput = {
+          WorkspaceId: validated.workspaceId,
+          ConnectorId: validated.connectorId,
+          PortId: validated.portId,
+          MessageId: validated.messageId,
+          File: validated.file,
+          Subfolder: validated.subfolder,
+          'Attachment#': validated.attachment,
+          FormatResult: validated.formatResult
+        };
+
+        try {
+          const results = await client.sendFile(sendInput);
+
+        if (!results || results.length === 0) {
+          return {
+            content: [{
+              type: "text",
+              text: `**Send Operation Completed**\n\n` +
+                `**Connector:** ${validated.connectorId}\n` +
+                (validated.workspaceId ? `**Workspace:** ${validated.workspaceId}\n` : '') +
+                `**Result:** Operation completed successfully but no files were available to send from the send folder.`
+            }]
+          };
+        }
+
+        // Filter out null/empty file entries (similar to receiveFile)
+        const actualFiles = results.filter(r => r.File && r.File.trim() !== '');
+
+        if (actualFiles.length === 0) {
+          return {
+            content: [{
+              type: "text",
+              text: `**Send Operation Completed**\n\n` +
+                `**Connector:** ${validated.connectorId}\n` +
+                (validated.workspaceId ? `**Workspace:** ${validated.workspaceId}\n` : '') +
+                `**Result:** Operation completed successfully but no files were available to send from the send folder.`
+            }]
+          };
+        }
+
+        let responseText = `**File Send Operation Completed**\n\n` +
+          `**Connector:** ${validated.connectorId}\n`;
+
+        if (validated.workspaceId) responseText += `**Workspace:** ${validated.workspaceId}\n`;
+        if (validated.file) responseText += `**Specific File:** ${validated.file}\n`;
+        if (validated.subfolder) responseText += `**Subfolder:** ${validated.subfolder}\n`;
+
+        responseText += `**Files Sent:** ${actualFiles.length}\n\n`;
+
+        responseText += `**Successfully Sent:**\n`;
+        actualFiles.forEach(file => {
+          responseText += `• **${file.File || 'Unknown'}**`;
+          if (file.MessageId) responseText += ` [${file.MessageId}]`;
+          responseText += "\n";
+        });
+
+        return {
+          content: [{
+            type: "text",
+            text: responseText
+          }]
+        };
+        } catch (error: any) {
+          // Handle API errors that contain detailed error information
+          let errorMessage = `Error during send operation: ${error.message}`;
+
+          if (error.response?.data?.error) {
+            const apiError = error.response.data.error;
+            errorMessage = `**Send Operation Failed**\n\n` +
+              `**Connector:** ${validated.connectorId}\n` +
+              (validated.workspaceId ? `**Workspace:** ${validated.workspaceId}\n` : '') +
+              `**Error Code:** ${apiError.code || 'Unknown'}\n` +
+              `**Error Message:** ${apiError.message || 'No details provided'}`;
+          }
+
+          return {
+            content: [{
+              type: "text",
+              text: errorMessage
+            }],
+            isError: true
+          };
+        }
       }
     }
   ];
