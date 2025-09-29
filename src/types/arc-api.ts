@@ -308,6 +308,24 @@ export interface GetMessageCountResult {
   Workspace?: string;
 }
 
+export interface GetTransactionLogsInput {
+  WorkspaceId?: string;
+  ConnectorId?: string;
+  PortId?: string;
+  MessageId: string;
+  Direction: string;
+  Type?: string;
+  IncludeContent?: string;
+}
+
+export interface GetTransactionLogsResult {
+  TimeCreated?: string;
+  Type?: string;
+  File?: string;
+  Path?: string;
+  Content?: string;
+}
+
 // API response types
 export interface ApiResponse<T> {
   value?: T[];

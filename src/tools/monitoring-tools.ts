@@ -48,6 +48,16 @@ const GetMessageCountSchema = z.object({
   connectorId: z.string().optional()
 });
 
+const GetTransactionLogsSchema = z.object({
+  workspaceId: z.string().optional(),
+  connectorId: z.string().optional(),
+  portId: z.string().optional(),
+  messageId: z.string().min(1, "Message ID is required"),
+  direction: z.string().min(1, "Direction is required"),
+  type: z.string().optional(),
+  includeContent: z.string().optional()
+});
+
 function formatDate(dateString?: string): string {
   if (!dateString) return 'Unknown';
   try {
@@ -670,6 +680,108 @@ export function createMonitoringTools(client: ArcApiClient) {
           responseText += "\n**Filters Applied:**\n";
           if (validated.workspaceId) responseText += `• Workspace: ${validated.workspaceId}\n`;
           if (validated.connectorId) responseText += `• Connector: ${validated.connectorId}\n`;
+        }
+
+        return {
+          content: [{
+            type: "text",
+            text: responseText
+          }]
+        };
+      }
+    },
+
+    {
+      name: "get_transaction_logs",
+      description: "Retrieve transaction details and log files for a specific message transaction",
+      inputSchema: {
+        type: "object",
+        properties: {
+          workspaceId: {
+            type: "string",
+            description: "The workspace ID"
+          },
+          connectorId: {
+            type: "string",
+            description: "The connector ID"
+          },
+          portId: {
+            type: "string",
+            description: "The port ID"
+          },
+          messageId: {
+            type: "string",
+            description: "The message ID (required)"
+          },
+          direction: {
+            type: "string",
+            description: "The direction of the transaction (required)"
+          },
+          type: {
+            type: "string",
+            description: "The type of the log file to filter by"
+          },
+          includeContent: {
+            type: "string",
+            description: "Whether to return the content of the log file (True/False, default: False)"
+          }
+        },
+        required: ["messageId", "direction"]
+      },
+      handler: async (args: any) => {
+        const validated = GetTransactionLogsSchema.parse(args);
+
+        const transactionLogsInput = {
+          WorkspaceId: validated.workspaceId,
+          ConnectorId: validated.connectorId,
+          PortId: validated.portId,
+          MessageId: validated.messageId,
+          Direction: validated.direction,
+          Type: validated.type,
+          IncludeContent: validated.includeContent || "False"
+        };
+
+        const results = await client.getTransactionLogs(transactionLogsInput);
+
+        if (!results || results.length === 0) {
+          return {
+            content: [{
+              type: "text",
+              text: "**No Transaction Logs Found**\n\nNo log files found for the specified transaction."
+            }]
+          };
+        }
+
+        let responseText = `**Transaction Logs**\n\n` +
+          `**Message ID:** ${validated.messageId}\n` +
+          `**Direction:** ${validated.direction}\n`;
+
+        if (validated.workspaceId) responseText += `**Workspace:** ${validated.workspaceId}\n`;
+        if (validated.connectorId) responseText += `**Connector:** ${validated.connectorId}\n`;
+        if (validated.portId) responseText += `**Port:** ${validated.portId}\n`;
+        if (validated.type) responseText += `**Log Type Filter:** ${validated.type}\n`;
+
+        responseText += `\n**Found ${results.length} log file(s):**\n\n`;
+
+        results.forEach((log, index) => {
+          responseText += `**Log ${index + 1}:**\n`;
+          responseText += `• **File:** ${log.File || 'Unknown'}\n`;
+          responseText += `• **Type:** ${log.Type || 'Unknown'}\n`;
+          responseText += `• **Created:** ${formatDate(log.TimeCreated)}\n`;
+          responseText += `• **Path:** ${log.Path || 'N/A'}\n`;
+
+          if (log.Content && validated.includeContent === "True") {
+            const contentPreview = log.Content.length > 200
+              ? log.Content.substring(0, 200) + "..."
+              : log.Content;
+            responseText += `• **Content:** ${contentPreview}\n`;
+          }
+
+          responseText += "\n";
+        });
+
+        if (validated.includeContent !== "True") {
+          responseText += "*Note: Set includeContent to 'True' to see log file contents*";
         }
 
         return {
