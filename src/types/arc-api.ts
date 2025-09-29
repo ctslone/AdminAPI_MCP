@@ -344,6 +344,19 @@ export interface ImportResult {
   [key: string]: any; // Allow additional properties in response
 }
 
+export interface ReceiveFileInput {
+  WorkspaceId?: string;
+  ConnectorId: string;
+}
+
+export interface ReceiveFileResult {
+  MessageId?: string;
+  Subfolder?: string;
+  File?: string;
+  FileSize?: string;
+  ErrorMessage?: string;
+}
+
 // API response types
 export interface ApiResponse<T> {
   value?: T[];

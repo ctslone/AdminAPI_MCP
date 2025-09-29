@@ -67,6 +67,11 @@ const CopyConnectorSchema = z.object({
   newWorkspaceId: z.string().optional()
 });
 
+const ReceiveFileSchema = z.object({
+  workspaceId: z.string().optional(),
+  connectorId: z.string().min(1, "Connector ID is required")
+});
+
 export function createConnectorTools(client: ArcApiClient) {
   return [
     {
@@ -491,6 +496,95 @@ export function createConnectorTools(client: ArcApiClient) {
 
         if (result && result.length > 0 && result[0].AllowedPrivileges) {
           responseText += `\n**Privileges:** ${result[0].AllowedPrivileges}`;
+        }
+
+        return {
+          content: [{
+            type: "text",
+            text: responseText
+          }]
+        };
+      }
+    },
+
+    {
+      name: "receive_file",
+      description: "Trigger the receive action of a connector to download/receive files",
+      inputSchema: {
+        type: "object",
+        properties: {
+          workspaceId: {
+            type: "string",
+            description: "The workspace ID of the connector"
+          },
+          connectorId: {
+            type: "string",
+            description: "The connector ID (required) - triggers the receive action for this connector"
+          }
+        },
+        required: ["connectorId"]
+      },
+      handler: async (args: any) => {
+        const validated = ReceiveFileSchema.parse(args);
+
+        const receiveInput = {
+          WorkspaceId: validated.workspaceId,
+          ConnectorId: validated.connectorId
+        };
+
+        const results = await client.receiveFile(receiveInput);
+
+        if (!results || results.length === 0) {
+          return {
+            content: [{
+              type: "text",
+              text: "**No Files Received**\n\nNo files were downloaded or the connector returned no results."
+            }]
+          };
+        }
+
+        // Filter out null/empty file entries (when operation succeeds but no files downloaded)
+        const actualFiles = results.filter(r => r.File && r.File.trim() !== '');
+
+        if (actualFiles.length === 0) {
+          return {
+            content: [{
+              type: "text",
+              text: `**Receive Operation Completed**\n\n` +
+                `**Connector:** ${validated.connectorId}\n` +
+                (validated.workspaceId ? `**Workspace:** ${validated.workspaceId}\n` : '') +
+                `**Result:** Operation completed successfully but no files were available to download.`
+            }]
+          };
+        }
+
+        let responseText = `**File Receive Operation Completed**\n\n` +
+          `**Connector:** ${validated.connectorId}\n`;
+
+        if (validated.workspaceId) responseText += `**Workspace:** ${validated.workspaceId}\n`;
+
+        responseText += `**Files Processed:** ${actualFiles.length}\n\n`;
+
+        const successfulFiles = actualFiles.filter(r => !r.ErrorMessage);
+        const failedFiles = actualFiles.filter(r => r.ErrorMessage);
+
+        if (successfulFiles.length > 0) {
+          responseText += `**Successfully Received (${successfulFiles.length}):**\n`;
+          successfulFiles.forEach(file => {
+            responseText += `• **${file.File || 'Unknown'}**`;
+            if (file.FileSize) responseText += ` (${file.FileSize} bytes)`;
+            if (file.Subfolder) responseText += ` in ${file.Subfolder}`;
+            if (file.MessageId) responseText += ` [${file.MessageId}]`;
+            responseText += "\n";
+          });
+          responseText += "\n";
+        }
+
+        if (failedFiles.length > 0) {
+          responseText += `**Failed (${failedFiles.length}):**\n`;
+          failedFiles.forEach(file => {
+            responseText += `• **${file.File || 'Unknown'}**: ${file.ErrorMessage}\n`;
+          });
         }
 
         return {

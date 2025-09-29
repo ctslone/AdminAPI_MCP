@@ -28,6 +28,8 @@ import type {
   GetTransactionLogsResult,
   ImportInput,
   ImportResult,
+  ReceiveFileInput,
+  ReceiveFileResult,
   ApiResponse,
   QueryParams
 } from '../types/arc-api.js';
@@ -478,5 +480,10 @@ export class ArcApiClient {
   async import(input: ImportInput): Promise<ImportResult> {
     const response = await this.client.post<ImportResult>('/import', input);
     return response.data;
+  }
+
+  async receiveFile(input: ReceiveFileInput): Promise<ReceiveFileResult[]> {
+    const response = await this.client.post<ApiResponse<ReceiveFileResult>>('/receiveFile', input);
+    return response.data.value || [];
   }
 }
