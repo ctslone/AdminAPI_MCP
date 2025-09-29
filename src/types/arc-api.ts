@@ -283,6 +283,20 @@ export interface ExchangeCertResult {
   [key: string]: any; // Allow additional properties in response
 }
 
+export interface ExportInput {
+  WorkspaceId?: string;
+  'ConnectorId#'?: string;
+  'FlowAPI#'?: string;
+  IncludeProfile?: string;
+  FlowPassword?: string;
+  GlobalSettings?: string;
+  ProfileSettings?: string;
+}
+
+export interface ExportResult {
+  Arcflow?: string;
+}
+
 // API response types
 export interface ApiResponse<T> {
   value?: T[];

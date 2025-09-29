@@ -2,6 +2,16 @@ import { z } from 'zod';
 import type { ArcApiClient } from '../services/arc-client.js';
 import type { CleanupInput } from '../types/arc-api.js';
 
+const ExportSchema = z.object({
+  workspaceId: z.string().optional(),
+  connectorId: z.string().optional(),
+  flowAPI: z.string().optional(),
+  includeProfile: z.string().optional(),
+  flowPassword: z.string().optional(),
+  globalSettings: z.string().optional(),
+  profileSettings: z.string().optional()
+});
+
 export function createActionTools(client: ArcApiClient) {
   return [
     {
@@ -84,6 +94,93 @@ export function createActionTools(client: ArcApiClient) {
             content: [{
               type: "text",
               text: `Error during cleanup operation: ${error.message}`
+            }],
+            isError: true
+          };
+        }
+      }
+    },
+
+    {
+      name: 'export_settings',
+      description: 'Export connector settings and workspace configuration to arcflow format',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          workspaceId: {
+            type: 'string',
+            description: 'The ID of the workspace to export. If unspecified, defaults to \'default\''
+          },
+          connectorId: {
+            type: 'string',
+            description: 'The ID of the connector to export. If unspecified, all connectors will be exported'
+          },
+          flowAPI: {
+            type: 'string',
+            description: 'The ID of the flow API'
+          },
+          includeProfile: {
+            type: 'string',
+            description: 'Whether profile related settings should be included in the exported arcflow'
+          },
+          flowPassword: {
+            type: 'string',
+            description: 'The password for encrypting sensitive values'
+          },
+          globalSettings: {
+            type: 'string',
+            description: 'Global settings to include. Comma-separated values or "ALL". Values: Partners, Documents, Users, Roles, Certificates, Connections, Vaults, Reports, Alerts, Advanced, AdminAPI, SSO'
+          },
+          profileSettings: {
+            type: 'string',
+            description: 'Profiles to include. Comma-separated values or "MATCHING" for matching profiles. Values: AS2, AS4, GISB, RosettaNet, FTPServer, SFTPServer, HL7MLLP, OFTP'
+          }
+        }
+      },
+      handler: async (args: any) => {
+        try {
+          const validated = ExportSchema.parse(args);
+
+          const exportInput = {
+            WorkspaceId: validated.workspaceId,
+            'ConnectorId#': validated.connectorId,
+            'FlowAPI#': validated.flowAPI,
+            IncludeProfile: validated.includeProfile,
+            FlowPassword: validated.flowPassword,
+            GlobalSettings: validated.globalSettings,
+            ProfileSettings: validated.profileSettings
+          };
+
+          const result = await client.export(exportInput);
+
+          let responseText = `**Export Completed Successfully**`;
+
+          // Add export parameters
+          if (validated.workspaceId) responseText += `\n**Workspace:** ${validated.workspaceId}`;
+          if (validated.connectorId) responseText += `\n**Connector:** ${validated.connectorId}`;
+          if (validated.flowAPI) responseText += `\n**Flow API:** ${validated.flowAPI}`;
+          if (validated.includeProfile) responseText += `\n**Include Profile:** ${validated.includeProfile}`;
+          if (validated.globalSettings) responseText += `\n**Global Settings:** ${validated.globalSettings}`;
+          if (validated.profileSettings) responseText += `\n**Profile Settings:** ${validated.profileSettings}`;
+
+          // Add arcflow details
+          if (result && result.length > 0 && result[0].Arcflow) {
+            const arcflowSize = result[0].Arcflow.length;
+            responseText += `\n\n**Arcflow Generated:** Base64 encoded (${arcflowSize} characters)`;
+            responseText += `\n**Preview:** ${result[0].Arcflow.substring(0, 100)}...`;
+          }
+
+          return {
+            content: [{
+              type: "text",
+              text: responseText
+            }]
+          };
+        } catch (error: any) {
+          return {
+            content: [{
+              type: "text",
+              text: `Error during export operation: ${error.message}`
             }],
             isError: true
           };
