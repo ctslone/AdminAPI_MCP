@@ -44,6 +44,8 @@ const UpdateConnectorSchema = z.object({
   automationMaxAttempts: z.number().optional(),
   automationReceive: z.boolean().optional(),
   receiveInterval: z.string().optional(),
+  resendInterval: z.number().optional(),
+  resendMaxAttempts: z.number().optional(),
   maxWorkers: z.number().optional(),
   maxFiles: z.number().optional(),
   sendFolder: z.string().optional(),
@@ -145,7 +147,7 @@ export function createConnectorTools(client: ArcApiClient) {
             {
               type: "text",
               text: `**Found ${connectors.length} connectors:**\n\n` +
-                connectors.map((c: any) => {
+                connectors.map(c => {
                   // API returns lowercase property names
                   const id = c.connectorid || 'Unknown';
                   const workspace = c.workspaceid || 'default';
@@ -211,21 +213,23 @@ export function createConnectorTools(client: ArcApiClient) {
           content: [{
             type: "text",
             text: `**Connector Details**\n\n` +
-              `**ID:** ${connector.ConnectorId}\n` +
-              `**Workspace:** ${connector.WorkspaceId || 'default'}\n` +
-              `**Type:** ${connector.ConnectorType || 'Unknown'}\n` +
-              `**Auto Send:** ${connector.AutomationSend ? 'Yes' : 'No'}\n` +
-              `**Auto Receive:** ${connector.AutomationReceive ? 'Yes' : 'No'}\n` +
-              `**Retry Interval:** ${connector.AutomationRetryInterval || 'N/A'} minutes\n` +
-              `**Max Attempts:** ${connector.AutomationMaxAttempts || 'N/A'}\n` +
-              `**Receive Interval:** ${connector.ReceiveInterval || 'N/A'}\n` +
-              `**Max Workers:** ${connector.MaxWorkers || 'Default'}\n` +
-              `**Max Files:** ${connector.MaxFiles || 'Default'}\n` +
-              `**Log Level:** ${connector.LogLevel || 'N/A'}\n` +
-              `**Log Messages:** ${connector.LogMessages ? 'Yes' : 'No'}\n` +
-              `**Save To Sent:** ${connector.SaveToSentFolder ? 'Yes' : 'No'}\n` +
-              (connector.SentFolderScheme ? `**Sent Folder Scheme:** ${connector.SentFolderScheme}\n` : '') +
-              (connector.LogSubFolderScheme ? `**Log Subfolder Scheme:** ${connector.LogSubFolderScheme}\n` : '')
+              `**ID:** ${connector.connectorid}\n` +
+              `**Workspace:** ${connector.workspaceid || 'default'}\n` +
+              `**Type:** ${connector.connectortype || 'Unknown'}\n` +
+              `**Auto Send:** ${connector.automationsend === 'true' || connector.automationsend === true ? 'Yes' : 'No'}\n` +
+              `**Auto Receive:** ${connector.automationreceive === 'true' || connector.automationreceive === true ? 'Yes' : 'No'}\n` +
+              `**Retry Interval:** ${connector.automationretryinterval || 'N/A'} minutes\n` +
+              `**Max Attempts:** ${connector.automationmaxattempts || 'N/A'}\n` +
+              `**Receive Interval:** ${connector.receiveinterval || 'N/A'}\n` +
+              `**Resend Interval:** ${connector.resendinterval || 'N/A'} minutes\n` +
+              `**Resend Max Attempts:** ${connector.resendmaxattempts || 'N/A'}\n` +
+              `**Max Workers:** ${connector.maxworkers || 'Default'}\n` +
+              `**Max Files:** ${connector.maxfiles || 'Default'}\n` +
+              `**Log Level:** ${connector.loglevel || 'N/A'}\n` +
+              `**Log Messages:** ${connector.logmessages === 'true' || connector.logmessages === true ? 'Yes' : 'No'}\n` +
+              `**Save To Sent:** ${connector.savetosentfolder === 'true' || connector.savetosentfolder === true ? 'Yes' : 'No'}\n` +
+              (connector.sentfolderscheme ? `**Sent Folder Scheme:** ${connector.sentfolderscheme}\n` : '') +
+              (connector.logsubfolderscheme ? `**Log Subfolder Scheme:** ${connector.logsubfolderscheme}\n` : '')
           }]
         };
       }
@@ -304,40 +308,40 @@ export function createConnectorTools(client: ArcApiClient) {
         const validated = CreateConnectorSchema.parse(args);
         
         const connectorData = {
-          ConnectorId: validated.connectorId,
-          WorkspaceId: validated.workspaceId,
-          ConnectorType: validated.connectorType,
-          AutomationSend: validated.automationSend,
-          AutomationRetryInterval: validated.automationRetryInterval,
-          AutomationMaxAttempts: validated.automationMaxAttempts,
-          AutomationReceive: validated.automationReceive,
-          ReceiveInterval: validated.receiveInterval,
-          MaxWorkers: validated.maxWorkers,
-          MaxFiles: validated.maxFiles,
-          SendFolder: validated.sendFolder,
-          ReceiveFolder: validated.receiveFolder,
-          SentFolder: validated.sentFolder,
-          SaveToSentFolder: validated.saveToSentFolder,
-          SentFolderScheme: validated.sentFolderScheme,
-          LogLevel: validated.logLevel,
-          LogSubFolderScheme: validated.logSubFolderScheme,
-          LogMessages: validated.logMessages
+          connectorid: validated.connectorId,
+          workspaceid: validated.workspaceId,
+          connectortype: validated.connectorType,
+          automationsend: validated.automationSend,
+          automationretryinterval: validated.automationRetryInterval,
+          automationmaxattempts: validated.automationMaxAttempts,
+          automationreceive: validated.automationReceive,
+          receiveinterval: validated.receiveInterval,
+          maxworkers: validated.maxWorkers,
+          maxfiles: validated.maxFiles,
+          sendfolder: validated.sendFolder,
+          receivefolder: validated.receiveFolder,
+          sentfolder: validated.sentFolder,
+          savetosentfolder: validated.saveToSentFolder,
+          sentfolderscheme: validated.sentFolderScheme,
+          loglevel: validated.logLevel,
+          logsubfolderscheme: validated.logSubFolderScheme,
+          logmessages: validated.logMessages
         };
 
         try {
           const connector = await client.createConnector(connectorData);
-          
+
           let responseText = `**Connector Created Successfully**\n\n` +
-            `**ID:** ${connector.ConnectorId}\n` +
-            `**Workspace:** ${connector.WorkspaceId || 'default'}\n` +
-            `**Type:** ${connector.ConnectorType}`;
+            `**ID:** ${connector.connectorid}\n` +
+            `**Workspace:** ${connector.workspaceid || 'default'}\n` +
+            `**Type:** ${connector.connectortype}`;
 
           // Only show automation settings if they were explicitly provided
           if (validated.automationSend !== undefined) {
-            responseText += `\n**Auto Send:** ${connector.AutomationSend ? 'Yes' : 'No'}`;
+            responseText += `\n**Auto Send:** ${connector.automationsend === 'true' || connector.automationsend === true ? 'Yes' : 'No'}`;
           }
           if (validated.automationReceive !== undefined) {
-            responseText += `\n**Auto Receive:** ${connector.AutomationReceive ? 'Yes' : 'No'}`;
+            responseText += `\n**Auto Receive:** ${connector.automationreceive === 'true' || connector.automationreceive === true ? 'Yes' : 'No'}`;
           }
 
           return {
@@ -366,7 +370,7 @@ export function createConnectorTools(client: ArcApiClient) {
 
     {
       name: "update_connector",
-      description: "Update an existing Arc connector's configuration", 
+      description: "Update an existing Arc connector's configuration",
       inputSchema: {
         type: "object",
         properties: {
@@ -399,8 +403,16 @@ export function createConnectorTools(client: ArcApiClient) {
             description: "Whether to automatically receive files at specified interval"
           },
           receiveInterval: {
-            type: "string", 
+            type: "string",
             description: "Interval for automatic file receiving"
+          },
+          resendInterval: {
+            type: "number",
+            description: "Time to wait before resending a file, in minutes"
+          },
+          resendMaxAttempts: {
+            type: "number",
+            description: "Maximum number of times to attempt resending a file"
           },
           maxWorkers: {
             type: "number",
@@ -437,36 +449,38 @@ export function createConnectorTools(client: ArcApiClient) {
         const validated = UpdateConnectorSchema.parse(args);
         
         const updates = {
-          ...(validated.workspaceId !== undefined && { WorkspaceId: validated.workspaceId }),
-          ...(validated.connectorType !== undefined && { ConnectorType: validated.connectorType }),
-          ...(validated.automationSend !== undefined && { AutomationSend: validated.automationSend }),
-          ...(validated.automationRetryInterval !== undefined && { AutomationRetryInterval: validated.automationRetryInterval }),
-          ...(validated.automationMaxAttempts !== undefined && { AutomationMaxAttempts: validated.automationMaxAttempts }),
-          ...(validated.automationReceive !== undefined && { AutomationReceive: validated.automationReceive }),
-          ...(validated.receiveInterval !== undefined && { ReceiveInterval: validated.receiveInterval }),
-          ...(validated.maxWorkers !== undefined && { MaxWorkers: validated.maxWorkers }),
-          ...(validated.maxFiles !== undefined && { MaxFiles: validated.maxFiles }),
-          ...(validated.sendFolder !== undefined && { SendFolder: validated.sendFolder }),
-          ...(validated.receiveFolder !== undefined && { ReceiveFolder: validated.receiveFolder }),
-          ...(validated.sentFolder !== undefined && { SentFolder: validated.sentFolder }),
-          ...(validated.saveToSentFolder !== undefined && { SaveToSentFolder: validated.saveToSentFolder }),
-          ...(validated.sentFolderScheme !== undefined && { SentFolderScheme: validated.sentFolderScheme }),
-          ...(validated.logLevel !== undefined && { LogLevel: validated.logLevel }),
-          ...(validated.logSubFolderScheme !== undefined && { LogSubFolderScheme: validated.logSubFolderScheme }),
-          ...(validated.logMessages !== undefined && { LogMessages: validated.logMessages })
+          ...(validated.workspaceId !== undefined && { workspaceid: validated.workspaceId }),
+          ...(validated.connectorType !== undefined && { connectortype: validated.connectorType }),
+          ...(validated.automationSend !== undefined && { automationsend: validated.automationSend }),
+          ...(validated.automationRetryInterval !== undefined && { automationretryinterval: validated.automationRetryInterval }),
+          ...(validated.automationMaxAttempts !== undefined && { automationmaxattempts: validated.automationMaxAttempts }),
+          ...(validated.automationReceive !== undefined && { automationreceive: validated.automationReceive }),
+          ...(validated.receiveInterval !== undefined && { receiveinterval: validated.receiveInterval }),
+          ...(validated.resendInterval !== undefined && { resendinterval: validated.resendInterval }),
+          ...(validated.resendMaxAttempts !== undefined && { resendmaxattempts: validated.resendMaxAttempts }),
+          ...(validated.maxWorkers !== undefined && { maxworkers: validated.maxWorkers }),
+          ...(validated.maxFiles !== undefined && { maxfiles: validated.maxFiles }),
+          ...(validated.sendFolder !== undefined && { sendfolder: validated.sendFolder }),
+          ...(validated.receiveFolder !== undefined && { receivefolder: validated.receiveFolder }),
+          ...(validated.sentFolder !== undefined && { sentfolder: validated.sentFolder }),
+          ...(validated.saveToSentFolder !== undefined && { savetosentfolder: validated.saveToSentFolder }),
+          ...(validated.sentFolderScheme !== undefined && { sentfolderscheme: validated.sentFolderScheme }),
+          ...(validated.logLevel !== undefined && { loglevel: validated.logLevel }),
+          ...(validated.logSubFolderScheme !== undefined && { logsubfolderscheme: validated.logSubFolderScheme }),
+          ...(validated.logMessages !== undefined && { logmessages: validated.logMessages })
         };
 
         const connector = await client.updateConnector(validated.connectorId, updates);
-        
+
         return {
           content: [{
-            type: "text", 
+            type: "text",
             text: `**Connector Updated Successfully**\n\n` +
-              `**ID:** ${connector.ConnectorId}\n` +
-              `**Workspace:** ${connector.WorkspaceId || 'default'}\n` +
-              `**Type:** ${connector.ConnectorType || 'Unknown'}\n` +
-              `**Auto Send:** ${connector.AutomationSend ? 'Yes' : 'No'}\n` +
-              `**Auto Receive:** ${connector.AutomationReceive ? 'Yes' : 'No'}`
+              `**ID:** ${connector.connectorid}\n` +
+              `**Workspace:** ${connector.workspaceid || 'default'}\n` +
+              `**Type:** ${connector.connectortype || 'Unknown'}\n` +
+              `**Auto Send:** ${connector.automationsend === 'true' || connector.automationsend === true ? 'Yes' : 'No'}\n` +
+              `**Auto Receive:** ${connector.automationreceive === 'true' || connector.automationreceive === true ? 'Yes' : 'No'}`
           }]
         };
       }

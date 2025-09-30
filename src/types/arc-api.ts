@@ -1,23 +1,28 @@
 // Types for CData Arc Admin API entities
+// Note: API returns all properties in lowercase
 export interface ArcConnector {
-  ConnectorId: string;
-  WorkspaceId?: string;
-  ConnectorType?: string;
-  AutomationSend?: boolean;
-  AutomationRetryInterval?: number;
-  AutomationMaxAttempts?: number;
-  AutomationReceive?: boolean;
-  ReceiveInterval?: string;
-  MaxWorkers?: number;
-  MaxFiles?: number;
-  SendFolder?: string;
-  ReceiveFolder?: string;
-  SentFolder?: string;
-  SaveToSentFolder?: boolean;
-  SentFolderScheme?: string;
-  LogLevel?: string;
-  LogSubFolderScheme?: string;
-  LogMessages?: boolean;
+  connectorid: string;
+  workspaceid?: string;
+  connectortype?: string;
+  automationsend?: boolean | string;
+  automationretryinterval?: number | string;
+  automationmaxattempts?: number | string;
+  automationreceive?: boolean | string;
+  receiveinterval?: string;
+  resendinterval?: number | string;
+  resendmaxattempts?: number | string;
+  maxworkers?: number | string;
+  maxfiles?: number | string;
+  sendfolder?: string;
+  receivefolder?: string;
+  sentfolder?: string;
+  savetosentfolder?: boolean | string;
+  sentfolderscheme?: string;
+  loglevel?: string;
+  logsubfolderscheme?: string;
+  logmessages?: boolean | string;
+  // Allow any other properties that may be returned by the API
+  [key: string]: any;
 }
 
 export interface ArcFile {
