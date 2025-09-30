@@ -129,7 +129,7 @@ export function createConnectorTools(client: ArcApiClient) {
       },
       handler: async (args: any) => {
         const validated = GetConnectorsSchema.parse(args);
-        
+
         const queryParams = {
           $select: validated.select,
           $filter: validated.filter,
@@ -139,20 +139,42 @@ export function createConnectorTools(client: ArcApiClient) {
         };
 
         const connectors = await client.getConnectors(queryParams);
-        
+
         return {
           content: [
             {
               type: "text",
               text: `**Found ${connectors.length} connectors:**\n\n` +
-                connectors.map(c => 
-                  `• **${c.ConnectorId}**\n` +
-                  `  Workspace: ${c.WorkspaceId || 'default'}\n` +
-                  `  Type: ${c.ConnectorType || 'Unknown'}\n` +
-                  `  Auto Send: ${c.AutomationSend ? 'Yes' : 'No'}\n` +
-                  `  Auto Receive: ${c.AutomationReceive ? 'Yes' : 'No'}\n` +
-                  `  Log Level: ${c.LogLevel || 'N/A'}\n`
-                ).join('\n')
+                connectors.map((c: any) => {
+                  // API returns lowercase property names
+                  const id = c.connectorid || c.ConnectorId || 'Unknown';
+                  const workspace = c.workspaceid || c.WorkspaceId || 'default';
+                  const type = c.connectortype || c.ConnectorType || 'Unknown';
+                  const autoSend = (c.automationsend || c.AutomationSend) === 'true' || (c.automationsend || c.AutomationSend) === true;
+                  const autoReceive = (c.automationreceive || c.AutomationReceive) === 'true' || (c.automationreceive || c.AutomationReceive) === true;
+                  const logLevel = c.loglevel || c.LogLevel || 'N/A';
+                  const receiveInterval = c.receiveinterval || c.ReceiveInterval || 'N/A';
+                  const retryInterval = c.automationretryinterval || c.AutomationRetryInterval || 'N/A';
+                  const maxAttempts = c.automationmaxattempts || c.AutomationMaxAttempts || 'N/A';
+                  const saveToSent = (c.savetosentfolder || c.SaveToSentFolder) === 'true' || (c.savetosentfolder || c.SaveToSentFolder) === true;
+                  const logMessages = (c.logmessages || c.LogMessages) === 'true' || (c.logmessages || c.LogMessages) === true;
+                  const maxWorkers = c.maxworkers || c.MaxWorkers || 'Default';
+                  const maxFiles = c.maxfiles || c.MaxFiles || 'Default';
+
+                  return `• **${id}**\n` +
+                    `  Workspace: ${workspace}\n` +
+                    `  Type: ${type}\n` +
+                    `  Auto Send: ${autoSend ? 'Yes' : 'No'}\n` +
+                    `  Auto Receive: ${autoReceive ? 'Yes' : 'No'}\n` +
+                    `  Receive Interval: ${receiveInterval}\n` +
+                    `  Retry Interval: ${retryInterval} min\n` +
+                    `  Max Attempts: ${maxAttempts}\n` +
+                    `  Max Workers: ${maxWorkers}\n` +
+                    `  Max Files: ${maxFiles}\n` +
+                    `  Save To Sent: ${saveToSent ? 'Yes' : 'No'}\n` +
+                    `  Log Level: ${logLevel}\n` +
+                    `  Log Messages: ${logMessages ? 'Yes' : 'No'}\n`;
+                }).join('\n')
             }
           ]
         };
