@@ -147,19 +147,19 @@ export function createConnectorTools(client: ArcApiClient) {
               text: `**Found ${connectors.length} connectors:**\n\n` +
                 connectors.map((c: any) => {
                   // API returns lowercase property names
-                  const id = c.connectorid || c.ConnectorId || 'Unknown';
-                  const workspace = c.workspaceid || c.WorkspaceId || 'default';
-                  const type = c.connectortype || c.ConnectorType || 'Unknown';
-                  const autoSend = (c.automationsend || c.AutomationSend) === 'true' || (c.automationsend || c.AutomationSend) === true;
-                  const autoReceive = (c.automationreceive || c.AutomationReceive) === 'true' || (c.automationreceive || c.AutomationReceive) === true;
-                  const logLevel = c.loglevel || c.LogLevel || 'N/A';
-                  const receiveInterval = c.receiveinterval || c.ReceiveInterval || 'N/A';
-                  const retryInterval = c.automationretryinterval || c.AutomationRetryInterval || 'N/A';
-                  const maxAttempts = c.automationmaxattempts || c.AutomationMaxAttempts || 'N/A';
-                  const saveToSent = (c.savetosentfolder || c.SaveToSentFolder) === 'true' || (c.savetosentfolder || c.SaveToSentFolder) === true;
-                  const logMessages = (c.logmessages || c.LogMessages) === 'true' || (c.logmessages || c.LogMessages) === true;
-                  const maxWorkers = c.maxworkers || c.MaxWorkers || 'Default';
-                  const maxFiles = c.maxfiles || c.MaxFiles || 'Default';
+                  const id = c.connectorid || 'Unknown';
+                  const workspace = c.workspaceid || 'default';
+                  const type = c.connectortype || 'Unknown';
+                  const autoSend = c.automationsend === 'true' || c.automationsend === true;
+                  const autoReceive = c.automationreceive === 'true' || c.automationreceive === true;
+                  const logLevel = c.loglevel || 'N/A';
+                  const receiveInterval = c.receiveinterval || 'N/A';
+                  const retryInterval = c.automationretryinterval || 'N/A';
+                  const maxAttempts = c.automationmaxattempts || 'N/A';
+                  const saveToSent = c.savetosentfolder === 'true' || c.savetosentfolder === true;
+                  const logMessages = c.logmessages === 'true' || c.logmessages === true;
+                  const maxWorkers = c.maxworkers || 'Default';
+                  const maxFiles = c.maxfiles || 'Default';
 
                   return `• **${id}**\n` +
                     `  Workspace: ${workspace}\n` +
