@@ -62,7 +62,7 @@ export interface ArcTransaction {
 export interface ArcLog {
   Id: string;
   Timestamp?: string;
-  Level?: string;
+  Type?: string;  // Log type/level (Error, Warning, Info, etc.)
   Message?: string;
   ConnectorId?: string;
   Category?: string;

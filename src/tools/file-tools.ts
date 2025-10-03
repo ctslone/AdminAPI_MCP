@@ -520,7 +520,7 @@ export function createFileTools(client: ArcApiClient) {
         const isoDate = cutoffDate.toISOString();
         
         const queryParams = {
-          $filter: `TimeCreated ge '${isoDate}'`,
+          $filter: `TimeCreated gt '${isoDate}'`,
           $orderby: 'TimeCreated DESC',
           $top: top
         };

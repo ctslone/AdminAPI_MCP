@@ -320,15 +320,15 @@ export function createMonitoringTools(client: ArcApiClient) {
         properties: {
           select: {
             type: "string",
-            description: "Comma-separated list of properties to include (e.g., 'Id,Level,Message')"
+            description: "Comma-separated list of properties to include (e.g., 'Id,Type,Message')"
           },
           filter: {
-            type: "string", 
-            description: "OData filter expression (e.g., \"Level eq 'Error'\" or \"ConnectorId eq 'MyConnector'\")"
+            type: "string",
+            description: "OData filter expression (e.g., \"Type eq 'Error'\" or \"ConnectorId eq 'MyConnector'\")"
           },
           orderby: {
             type: "string",
-            description: "Order results by property (e.g., 'Timestamp DESC' or 'Level ASC')"
+            description: "Order results by property (e.g., 'Timestamp DESC' or 'Type ASC')"
           },
           top: {
             type: "number",
@@ -366,8 +366,8 @@ export function createMonitoringTools(client: ArcApiClient) {
           content: [{
             type: "text",
             text: `Found ${logs.length} log entries:\n\n` +
-              logs.map(l => 
-                `${getLogLevelIcon(l.Level)} **${formatDate(l.Timestamp)}** [${l.Level || 'INFO'}]\n` +
+              logs.map(l =>
+                `${getLogLevelIcon(l.Type)} **${formatDate(l.Timestamp)}** [${l.Type || 'INFO'}]\n` +
                 `  ${l.Message || 'No message'}\n` +
                 (l.ConnectorId ? `  Connector: ${l.ConnectorId}\n` : '') +
                 (l.Category ? `  Category: ${l.Category}\n` : '')
@@ -406,10 +406,10 @@ export function createMonitoringTools(client: ArcApiClient) {
         return {
           content: [{
             type: "text",
-            text: `${getLogLevelIcon(log.Level)} **Log Entry Details**\n\n` +
+            text: `${getLogLevelIcon(log.Type)} **Log Entry Details**\n\n` +
               `**ID:** ${log.Id}\n` +
               `**Timestamp:** ${formatDate(log.Timestamp)}\n` +
-              `**Level:** ${log.Level || 'INFO'}\n` +
+              `**Type:** ${log.Type || 'INFO'}\n` +
               `**Message:** ${log.Message || 'No message'}\n` +
               (log.ConnectorId ? `**Connector ID:** ${log.ConnectorId}\n` : '') +
               (log.Category ? `**Category:** ${log.Category}\n` : '')
@@ -446,7 +446,7 @@ export function createMonitoringTools(client: ArcApiClient) {
         const cutoffDate = new Date(Date.now() - hours * 60 * 60 * 1000);
         const isoDate = cutoffDate.toISOString();
         
-        let filter = `Timestamp ge '${isoDate}' and Level eq 'Error'`;
+        let filter = `Timestamp ge '${isoDate}' and Type eq 'Error'`;
         if (connectorId) {
           filter += ` and ConnectorId eq '${connectorId}'`;
         }
