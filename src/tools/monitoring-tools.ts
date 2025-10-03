@@ -249,7 +249,7 @@ export function createMonitoringTools(client: ArcApiClient) {
         const isoDate = cutoffDate.toISOString();
         
         const queryParams = {
-          $filter: `Timestamp ge ${isoDate}`,
+          $filter: `Timestamp ge '${isoDate}'`,
           $orderby: 'Timestamp DESC',
           $top: top
         };
@@ -446,7 +446,7 @@ export function createMonitoringTools(client: ArcApiClient) {
         const cutoffDate = new Date(Date.now() - hours * 60 * 60 * 1000);
         const isoDate = cutoffDate.toISOString();
         
-        let filter = `Timestamp ge ${isoDate} and Level eq 'Error'`;
+        let filter = `Timestamp ge '${isoDate}' and Level eq 'Error'`;
         if (connectorId) {
           filter += ` and ConnectorId eq '${connectorId}'`;
         }
