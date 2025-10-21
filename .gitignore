@@ -63,3 +63,4 @@ pids
 
 # Claude instructions (local development only)
 CLAUDE.md
+example_prompts.md
