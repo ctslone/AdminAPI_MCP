@@ -2,34 +2,12 @@ import { z } from 'zod';
 import type { ArcApiClient } from '../services/arc-client.js';
 
 // Zod schemas for validation
-const UpdateProfileSchema = z.object({
-  LogLevel: z.string().optional(),
-  MaxLogSize: z.number().positive().optional(),
-  LogRetentionDays: z.number().positive().optional(),
-  NotifyStopStart: z.boolean().optional(),
-  SSOEnabled: z.boolean().optional(),
-  SSOEnableJITProvisioning: z.boolean().optional(),
-  SyslogEnable: z.boolean().optional(),
-  SysLogEnabledLogs: z.string().optional(),
-  SysLogSSLEnabled: z.boolean().optional(),
-  // Email notification settings
-  NotifyEmail: z.string().email().optional(),
-  NotifyEmailTo: z.string().email().optional(),
-  NotifyEmailFrom: z.string().email().optional(),
-  // SMTP settings
-  SMTPServer: z.string().optional(),
-  SMTPUser: z.string().optional(),
-  SMTPPort: z.string().optional(),
-  SMTPSSLMode: z.string().optional(),
-  // Other profile settings
-  AS4PartyID: z.string().optional(),
-  ProxyHost: z.string().optional(),
-  ProxyPort: z.string().optional(),
-  ProxyType: z.string().optional(),
-  SyslogRemoteHost: z.string().optional(),
-  SyslogRemotePort: z.string().optional(),
-  UITimeFormat: z.string().optional()
-}).passthrough(); // Allow additional properties not explicitly defined
+// Profile schema accepts any property since Arc supports hundreds of profile settings
+// including protocol-specific ones like "as2:as2identifier", "as4:partyid", etc.
+const UpdateProfileSchema = z.record(z.any()).refine(
+  (data) => Object.keys(data).length > 0,
+  { message: "At least one profile property must be provided" }
+);
 
 const GetWorkspacesSchema = z.object({
   select: z.string().optional(),
@@ -143,117 +121,21 @@ export function createConfigurationTools(client: ArcApiClient) {
 
     {
       name: "update_profile",
-      description: "Update Arc application profile configuration settings",
+      description: "Update Arc application profile configuration settings. Accepts any profile property including protocol-specific settings. Common examples:\n" +
+        "- Global settings: loglevel, ssoenabled, notifyemailfrom, smtpserver, etc.\n" +
+        "- AS2 profile: 'as2:as2identifier', 'as2:receivingurl', 'as2:publicurl', etc.\n" +
+        "- AS4 profile: 'as4:partyid', 'as4:partyidtype', etc.\n" +
+        "- Other protocols: 'sftp:*', 'ftp:*', 'http:*', etc.\n" +
+        "Property names must be lowercase and use colons for protocol-specific settings (e.g., 'as2:as2identifier' not 'AS2Identifier').",
       inputSchema: {
         type: "object",
-        properties: {
-          LogLevel: {
-            type: "string",
-            description: "Log level (e.g., 'Debug', 'Info', 'Warning', 'Error')"
-          },
-          MaxLogSize: {
-            type: "number",
-            description: "Maximum log file size in bytes"
-          },
-          LogRetentionDays: {
-            type: "number",
-            description: "Number of days to retain log files"
-          },
-          NotifyStopStart: {
-            type: "boolean",
-            description: "Enable notification when application starts/stops"
-          },
-          SSOEnabled: {
-            type: "boolean",
-            description: "Enable Single Sign-On"
-          },
-          SSOEnableJITProvisioning: {
-            type: "boolean",
-            description: "Enable Just-In-Time provisioning for SSO users"
-          },
-          SyslogEnable: {
-            type: "boolean",
-            description: "Enable sending logs to syslog server"
-          },
-          SysLogEnabledLogs: {
-            type: "string",
-            description: "Types of logs to send to syslog"
-          },
-          SysLogSSLEnabled: {
-            type: "boolean",
-            description: "Enable SSL for syslog communication"
-          },
-          // Email notification settings
-          NotifyEmail: {
-            type: "string",
-            description: "Email address to receive notifications"
-          },
-          NotifyEmailTo: {
-            type: "string",
-            description: "Email address to send notifications to"
-          },
-          NotifyEmailFrom: {
-            type: "string",
-            description: "Email address notifications are sent from"
-          },
-          // SMTP settings
-          SMTPServer: {
-            type: "string",
-            description: "SMTP server hostname or IP address"
-          },
-          SMTPUser: {
-            type: "string",
-            description: "SMTP server username"
-          },
-          SMTPPort: {
-            type: "string",
-            description: "SMTP server port number"
-          },
-          SMTPSSLMode: {
-            type: "string",
-            description: "SMTP SSL mode (e.g., 'None', 'Implicit', 'Explicit')"
-          },
-          // Other settings
-          AS4PartyID: {
-            type: "string",
-            description: "AS4 Party ID for messaging"
-          },
-          ProxyHost: {
-            type: "string",
-            description: "Proxy server hostname or IP address"
-          },
-          ProxyPort: {
-            type: "string",
-            description: "Proxy server port number"
-          },
-          ProxyType: {
-            type: "string",
-            description: "Proxy server type"
-          },
-          SyslogRemoteHost: {
-            type: "string",
-            description: "Remote syslog server hostname"
-          },
-          SyslogRemotePort: {
-            type: "string",
-            description: "Remote syslog server port"
-          },
-          UITimeFormat: {
-            type: "string",
-            description: "Time format for UI display (12 or 24)"
-          }
-        },
+        description: "Profile properties to update. Accepts any valid Arc profile property name.",
         additionalProperties: true
       },
       handler: async (args: any) => {
         const validated = UpdateProfileSchema.parse(args);
-        
-        // Filter out undefined values
-        const updates = Object.fromEntries(
-          Object.entries(validated).filter(([_, value]) => value !== undefined)
-        );
-        
-        if (Object.keys(updates).length === 0) {
+
+        if (Object.keys(validated).length === 0) {
           return {
             content: [{
               type: "text",
@@ -261,15 +143,15 @@ export function createConfigurationTools(client: ArcApiClient) {
             }]
           };
         }
-        
-        const updatedProfile = await client.updateProfile(updates);
-        
+
+        const updatedProfile = await client.updateProfile(validated);
+
         return {
           content: [{
             type: "text",
             text: `**Profile Updated Successfully**\n\n` +
               `Updated settings:\n` +
-              Object.entries(updates).map(([key, value]) => `  • ${key}: ${value}`).join('\n')
+              Object.entries(validated).map(([key, value]) => `  • ${key}: ${value}`).join('\n')
           }]
         };
       }

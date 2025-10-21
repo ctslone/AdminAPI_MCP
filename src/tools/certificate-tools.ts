@@ -14,9 +14,9 @@ const GetCertificateSchema = z.object({
   name: z.string().min(1, "Certificate name is required")
 });
 
-const CreateCertificateSchema = z.object({
+const ImportCertificateSchema = z.object({
   name: z.string().min(1, "Certificate name is required"),
-  data: z.string().optional(),
+  data: z.string().min(1, "Certificate data is required"),
   storeType: z.string().optional(),
   subject: z.string().optional(),
   issuer: z.string().optional(),
@@ -179,18 +179,18 @@ export function createCertificateTools(client: ArcApiClient) {
     },
 
     {
-      name: "create_certificate",
-      description: "Create a new Arc certificate",
+      name: "import_certificate",
+      description: "Import an existing certificate into Arc. Use this ONLY when you already have a certificate file and need to upload it. The user must provide the base64-encoded certificate data. To generate a NEW certificate from scratch, use 'create_cert' instead.",
       inputSchema: {
         type: "object",
         properties: {
           name: {
-            type: "string", 
-            description: "The name of the certificate file (required)"
+            type: "string",
+            description: "REQUIRED: The name of the certificate file (e.g., 'partner_cert.pfx')"
           },
           data: {
             type: "string",
-            description: "The base-64 encoded contents of the certificate file"
+            description: "REQUIRED: The base-64 encoded contents of the certificate file (PFX/P12/PEM format)"
           },
           storeType: {
             type: "string",
@@ -245,10 +245,10 @@ export function createCertificateTools(client: ArcApiClient) {
             description: "Comma-separated list of connector IDs that should use this certificate"
           }
         },
-        required: ["name"]
+        required: ["name", "data"]
       },
       handler: async (args: any) => {
-        const validated = CreateCertificateSchema.parse(args);
+        const validated = ImportCertificateSchema.parse(args);
         
         const certificateData = {
           Name: validated.name,
@@ -313,65 +313,65 @@ export function createCertificateTools(client: ArcApiClient) {
 
     {
       name: "create_cert",
-      description: "Create a public/private certificate key pair with specified parameters",
+      description: "Create a public/private certificate key pair. IMPORTANT: All 4 required parameters (filename, commonName, serialnumber, password) must be provided. Use a unique serial number like a timestamp or random number.",
       inputSchema: {
         type: "object",
         properties: {
           filename: {
             type: "string",
-            description: "The certificate filename"
+            description: "REQUIRED: The certificate filename (e.g., 'mycert.pfx' or 'partner_cert.p12')"
           },
           commonName: {
             type: "string",
-            description: "The common name for the certificate"
+            description: "REQUIRED: The common name for the certificate (e.g., the AS2 identifier or organization name)"
           },
           serialnumber: {
             type: "string",
-            description: "The serial number for the certificate"
+            description: "REQUIRED: The serial number for the certificate. Must be a decimal number (e.g., '123456') or hexadecimal prefixed with '0x' (e.g., '0x1FE2A3B4'). Generate a random 6-8 digit decimal number (e.g., between 100000 and 99999999) or use hex format."
           },
           password: {
             type: "string",
-            description: "The password to protect the private key"
+            description: "REQUIRED: The password to protect the private key. Generate a secure password if not provided by user."
           },
           country: {
             type: "string",
-            description: "The country"
+            description: "Optional: The country code (e.g., 'US', 'GB')"
           },
           email: {
             type: "string",
-            description: "Email address"
+            description: "Optional: Email address"
           },
           expiration: {
             type: "string",
-            description: "Expiration in years (default: 1)"
+            description: "Optional: Expiration in years (default: '1')"
           },
           keySize: {
             type: "string",
-            description: "The key size (default: 2048)"
+            description: "Optional: The key size (default: '2048')"
           },
           publicKeyType: {
             type: "string",
-            description: "The public key type (default: X.509)"
+            description: "Optional: The public key type (default: 'X.509')"
           },
           signatureAlgorithm: {
             type: "string",
-            description: "The signature algorithm (default: SHA256)"
+            description: "Optional: The signature algorithm (default: 'SHA256')"
           },
           locality: {
             type: "string",
-            description: "The locality/city"
+            description: "Optional: The locality/city"
           },
           organization: {
             type: "string",
-            description: "The organization name"
+            description: "Optional: The organization name"
           },
           organizationalUnit: {
             type: "string",
-            description: "The organizational unit"
+            description: "Optional: The organizational unit"
           },
           state: {
             type: "string",
-            description: "The state/province"
+            description: "Optional: The state/province"
           }
         },
         required: ["filename", "commonName", "serialnumber", "password"]
