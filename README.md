@@ -162,10 +162,14 @@ This MCP server supports two communication modes:
 - **Testing**: Use `npm run start` to test the server manually in stdio mode (it will wait for JSON-RPC messages on stdin)
 
 #### HTTP Mode
-- **How it works**: MCP server runs as a standalone HTTP service that an AI web service can connect to
-- **When to use**: Designed for server deployments where the MCP server runs on a remote machine and accepts API requests
+- **How it works**: MCP server runs as a standalone HTTP service with a health check endpoint
+- **When to use**: Designed for server deployments and monitoring
+- **Current limitations**:
+  - Only supports plaintext HTTP (SSL/TLS support planned for future release)
+  - Only `/health` endpoint currently available (MCP protocol endpoints coming soon)
+  - Not compatible with Claude Desktop remote connections (requires HTTPS and SSE endpoints)
 - **Configuration**: Set `MCP_TRANSPORT_MODE=http` and optionally `MCP_HTTP_PORT=3000`
-- **Testing**: Use `npm run start` with environment variables, then connect Claude Desktop to `http://localhost:3000`
+- **Testing**: Use `npm run start:http` with environment variables, then test the health endpoint at `http://localhost:3000/health`
 
 ## 🚦 Getting Started
 
