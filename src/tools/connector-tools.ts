@@ -16,8 +16,9 @@ const GetConnectorSchema = z.object({
 
 const CreateConnectorSchema = z.object({
   connectorId: z.string().min(1, "Connector ID is required"),
-  workspaceId: z.string().optional(),
   connectorType: z.string().min(1, "Connector type is required"),
+  action: z.enum(["Trigger", "Terminal", "Transform", "None"]),
+  workspaceId: z.string().optional(),
   automationSend: z.boolean().optional(),
   automationRetryInterval: z.number().optional(),
   automationMaxAttempts: z.number().optional(),
@@ -217,21 +218,26 @@ export function createConnectorTools(client: ArcApiClient) {
 
     {
       name: "create_connector",
-      description: "Create a new Arc connector. Requires connectorId and connectorType. If workspaceId is not specified, connector is created in the default workspace.",
+      description: "Create a new Arc connector. Requires connectorId, connectorType, and action. The action property defines the connector's role in flows. If workspaceId is not specified, connector is created in the default workspace.",
       inputSchema: {
         type: "object",
         properties: {
           connectorId: {
-            type: "string", 
+            type: "string",
             description: "Unique identifier for the new connector (required)"
+          },
+          connectorType: {
+            type: "string",
+            description: "Connector type (e.g., 'AS2', 'FTP', 'SFTP', 'REST', 'File') (required)"
+          },
+          action: {
+            type: "string",
+            enum: ["Trigger", "Terminal", "Transform", "None"],
+            description: "Connector's role in flows (required). Trigger: starts flow (pulls/receives data). Terminal: ends flow (sends/stores data). Transform: processes data in middle of flow. None: for dual-role connectors like File that adapt to their position."
           },
           workspaceId: {
             type: "string",
             description: "The workspace ID (defaults to 'default' if not specified)"
-          },
-          connectorType: {
-            type: "string",
-            description: "Connector type (e.g., 'AS2', 'FTP', 'SFTP', 'REST')"
           },
           automationSend: {
             type: "boolean",
@@ -282,12 +288,12 @@ export function createConnectorTools(client: ArcApiClient) {
             description: "Log folder structure: Daily, Weekly, Monthly, or Yearly"
           }
         },
-        required: ["connectorId", "connectorType"]
+        required: ["connectorId", "connectorType", "action"]
       },
       handler: async (args: any) => {
         const validated = CreateConnectorSchema.parse(args);
         
-        const connectorData = {
+        const connectorData: any = {
           connectorid: validated.connectorId,
           workspaceid: validated.workspaceId,
           connectortype: validated.connectorType,
@@ -307,6 +313,11 @@ export function createConnectorTools(client: ArcApiClient) {
           logsubfolderscheme: validated.logSubFolderScheme,
           logmessages: validated.logMessages
         };
+
+        // Only include action if it's not "None"
+        if (validated.action !== "None") {
+          connectorData.action = validated.action;
+        }
 
         try {
           const connector = await client.createConnector(connectorData);
