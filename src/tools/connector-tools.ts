@@ -350,7 +350,7 @@ export function createConnectorTools(client: ArcApiClient) {
 
     {
       name: "update_connector",
-      description: "Update an existing Arc connector's configuration. Accepts any connector property from the get_connector response. Common AS2 examples: 'as2identifier', 'url', 'certificate', 'signingcertificate', 'useencryption', 'usesigning', etc. For complete list of available properties, first call get_connector to see the full configuration.",
+      description: "Update an existing Arc connector's configuration. Automatically fetches the connector details to validate property names against available properties for that connector type. Only valid properties will be updated; invalid ones will be reported. Common SFTP examples: 'host', 'port', 'username', 'password', 'automationsend', 'receiveinterval'. Common AS2 examples: 'as2identifier', 'url', 'certificate', 'signingcertificate', 'useencryption', 'usesigning'.",
       inputSchema: {
         type: "object",
         properties: {
@@ -369,15 +369,60 @@ export function createConnectorTools(client: ArcApiClient) {
       handler: async (args: any) => {
         const validated = UpdateConnectorSchema.parse(args);
 
-        const connector = await client.updateConnector(validated.connectorId, validated.properties);
+        // First, fetch the connector details to see what properties are available
+        const connectorDetails = await client.getConnector(validated.connectorId);
+
+        if (!connectorDetails) {
+          return {
+            content: [{
+              type: "text",
+              text: `Connector '${validated.connectorId}' not found.`
+            }]
+          };
+        }
+
+        // Check for unrecognized properties and warn if any don't exist in the connector config
+        const warnings: string[] = [];
+        const validProperties = new Set(Object.keys(connectorDetails).map(k => k.toLowerCase()));
+
+        const unknownProps = Object.keys(validated.properties).filter(prop =>
+          !validProperties.has(prop.toLowerCase())
+        );
+
+        if (unknownProps.length > 0) {
+          warnings.push(`⚠️ The following properties don't exist in this connector type and were not updated:\n  • ${unknownProps.join('\n  • ')}`);
+        }
+
+        // Only update properties that exist in the connector configuration
+        const validUpdateProps = Object.fromEntries(
+          Object.entries(validated.properties).filter(([key]) => validProperties.has(key.toLowerCase()))
+        );
+
+        if (Object.keys(validUpdateProps).length === 0) {
+          return {
+            content: [{
+              type: "text",
+              text: `**No Valid Properties to Update**\n\n` +
+                `None of the provided properties match this connector's available properties.\n\n` +
+                `Available properties for ${connectorDetails.connectortype} connector:\n` +
+                `${Object.keys(connectorDetails).sort().join(', ')}`
+            }]
+          };
+        }
+
+        const updatedConnector = await client.updateConnector(validated.connectorId, validUpdateProps);
 
         let resultText = `**Connector Updated Successfully**\n\n` +
-          `**ID:** ${connector.connectorid}\n` +
-          `**Workspace:** ${connector.workspaceid || 'default'}\n` +
-          `**Type:** ${connector.connectortype || 'Unknown'}\n\n` +
-          `**Updated Properties:**\n`;
+          `**ID:** ${updatedConnector.connectorid}\n` +
+          `**Workspace:** ${updatedConnector.workspaceid || 'default'}\n` +
+          `**Type:** ${updatedConnector.connectortype || 'Unknown'}\n\n`;
 
-        Object.entries(validated.properties).forEach(([key, value]) => {
+        if (warnings.length > 0) {
+          resultText += `**Warnings:**\n${warnings.join('\n')}\n\n`;
+        }
+
+        resultText += `**Successfully Updated Properties:**\n`;
+        Object.entries(validUpdateProps).forEach(([key, value]) => {
           resultText += `  • ${key}: ${value}\n`;
         });
 
