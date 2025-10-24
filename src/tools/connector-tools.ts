@@ -350,7 +350,7 @@ export function createConnectorTools(client: ArcApiClient) {
 
     {
       name: "update_connector",
-      description: "Update an existing Arc connector's configuration. Automatically fetches the connector details to validate property names against available properties for that connector type. Only valid properties will be updated; invalid ones will be reported. Common SFTP examples: 'host', 'port', 'username', 'password', 'automationsend', 'receiveinterval'. Common AS2 examples: 'as2identifier', 'url', 'certificate', 'signingcertificate', 'useencryption', 'usesigning'.",
+      description: "Update an existing Arc connector's configuration. Automatically fetches the connector details to validate property names against available properties for that connector type. Only valid properties will be updated; invalid ones will be reported.\n\nIMPORTANT: The 'receiveinterval' property requires a 5-part cron expression: minute hour day-of-month month day-of-week. Example: '0 2 * * *' for daily at 2 AM. Ranges and lists supported (e.g., '*/2 8-17 * * 1,3,5' for every even minute 8AM-5PM on Mon/Wed/Fri).\n\nCommon SFTP examples: 'host', 'port', 'username', 'password', 'automationsend', 'receiveinterval'. Common AS2 examples: 'as2identifier', 'url', 'certificate', 'signingcertificate', 'useencryption', 'usesigning'.",
       inputSchema: {
         type: "object",
         properties: {
@@ -390,7 +390,20 @@ export function createConnectorTools(client: ArcApiClient) {
         );
 
         if (unknownProps.length > 0) {
-          warnings.push(`⚠️ The following properties don't exist in this connector type and were not updated:\n  • ${unknownProps.join('\n  • ')}`);
+          warnings.push(`The following properties don't exist in this connector type and were not updated:\n  • ${unknownProps.join('\n  • ')}`);
+        }
+
+        // Special validation for receiveinterval - must be a valid cron expression
+        if (validated.properties.receiveinterval) {
+          const cronPattern = String(validated.properties.receiveinterval).trim();
+          // Basic cron validation: should have 5 parts separated by spaces
+          // Format: minute hour day-of-month month day-of-week
+          const cronParts = cronPattern.split(/\s+/);
+          if (cronParts.length !== 5) {
+            warnings.push(`'receiveinterval' value '${cronPattern}' doesn't appear to be a valid cron expression. Expected format: 'minute hour day-of-month month day-of-week' (e.g., '0 2 * * *' for daily at 2 AM). The value was not updated.`);
+            // Remove receiveinterval from update since it's invalid
+            delete validated.properties.receiveinterval;
+          }
         }
 
         // Only update properties that exist in the connector configuration
