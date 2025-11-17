@@ -396,12 +396,20 @@ export class ArcApiClient {
   }
 
   async createReport(report: Partial<ArcReport>): Promise<ArcReport> {
-    const response = await this.client.post<ArcReport>('/reports', report);
+    // Filter out undefined properties to avoid sending null values to the API
+    const cleanedReport = Object.fromEntries(
+      Object.entries(report).filter(([, value]) => value !== undefined)
+    );
+    const response = await this.client.post<ArcReport>('/reports', cleanedReport);
     return response.data;
   }
 
   async updateReport(name: string, report: Partial<ArcReport>): Promise<ArcReport> {
-    const response = await this.client.put<ArcReport>(`/reports('${name}')`, report);
+    // Filter out undefined properties to avoid sending null values to the API
+    const cleanedReport = Object.fromEntries(
+      Object.entries(report).filter(([, value]) => value !== undefined)
+    );
+    const response = await this.client.put<ArcReport>(`/reports('${name}')`, cleanedReport);
     return response.data;
   }
 
