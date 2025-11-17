@@ -387,7 +387,9 @@ export class ArcApiClient {
 
   async getReport(name: string): Promise<ArcReport | null> {
     try {
-      const response = await this.client.get<ArcReport>(`/reports('${name}')`);
+      const response = await this.client.get<ArcReport>('/reports', {
+        data: { Name: name }
+      });
       return response.data;
     } catch (error: any) {
       if (error.response?.status === 404) return null;
@@ -409,12 +411,18 @@ export class ArcApiClient {
     const cleanedReport = Object.fromEntries(
       Object.entries(report).filter(([, value]) => value !== undefined)
     );
-    const response = await this.client.put<ArcReport>(`/reports('${name}')`, cleanedReport);
+    // Name is required in the request body for Arc API
+    if (!cleanedReport.Name) {
+      cleanedReport.Name = name;
+    }
+    const response = await this.client.put<ArcReport>('/reports', cleanedReport);
     return response.data;
   }
 
   async deleteReport(name: string): Promise<void> {
-    await this.client.delete(`/reports('${name}')`);
+    await this.client.delete('/reports', {
+      data: { Name: name }
+    });
   }
 
   // Request operations
