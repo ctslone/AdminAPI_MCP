@@ -205,73 +205,73 @@ export function createReportTools(client: ArcApiClient) {
 
     {
       name: "create_report",
-      description: "Create a new Arc report with specified configuration",
+      description: "Create a new Arc report with specified configuration. The Columns parameter is critical - include the metrics you want to see in the report (e.g., TransactionsSent, TransactionsReceived, TotalProcessingTime, TransactionsSuccess, TransactionsError).",
       inputSchema: {
         type: "object",
         properties: {
           name: {
             type: "string",
-            description: "Unique name for the new report"
+            description: "Unique name for the new report (can be any descriptive name)"
           },
           type: {
             type: "string",
-            description: "Type of report (e.g., 'Summary', 'Detailed', 'Transaction')"
+            description: "Type of report. Valid values: 'Connector', 'EDI'"
           },
           timePeriod: {
             type: "string",
-            description: "Time period in days (e.g., '7', '30', '90')"
+            description: "Time period for the report. Valid values: 'All', 'LastMonth', 'Last3Months', 'Last6Months', 'Last12Months', 'MonthToDate', 'QuarterToDate', 'YearToDate', 'SinceLastRun', 'Custom' (if using Custom, also set timePeriodStart and timePeriodEnd in format: 2025-11-04T00:00:00.000-05:00)"
           },
           columns: {
             type: "string",
-            description: "Comma-separated list of columns to include"
+            description: "CRITICAL: Comma-separated list of metrics to include in the report. Valid values: WorkspaceId, ConnectorId, ConnectorType, TransactionsAll, TransactionsSent, TransactionsReceived, TotalProcessingTime, TotalFileSize, TransactionsSuccess, TransactionsError, TransactionsWarning. Always include relevant columns based on what the user is asking for."
           },
           groupRows: {
             type: "string",
-            description: "Columns to group by in the report"
+            description: "Comma-separated list of dimensions to group the report by. Valid values: Year, Quarter, Month, Week, WorkspaceId, ConnectorType"
           },
           filters: {
             type: "string",
-            description: "Filter criteria (e.g., 'ConnectorType=SFTP,FTP;ConnectorId=SFTP1')"
+            description: "Filters to apply to the report. Use ConnectorType (e.g., 'AS2', 'SFTP', 'FTP') and/or ConnectorId. Example: 'ConnectorType=AS2' or 'ConnectorType=SFTP,FTP;ConnectorId=SFTP1,SFTP2'"
           },
           summary: {
             type: "string",
-            description: "Summary information to include in the report"
+            description: "Summary statistics to include. Valid values: Total, Average, Minimum, Maximum"
           },
           schedule: {
             type: "string",
-            description: "Cron schedule expression for automated reports"
+            description: "Cron expression for automated report scheduling. Format: 'minute hour day month dayOfWeek'. Example: '30 15 1 * *' runs on the 1st of each month at 15:30"
           },
           startDate: {
             type: "string",
-            description: "Schedule start date (ISO format)"
+            description: "Schedule start date in ISO format (only used with schedule parameter). Example: 2025-11-04T00:00:00.000-05:00"
           },
           endDate: {
             type: "string",
-            description: "Schedule end date (ISO format)"
+            description: "Schedule end date in ISO format (only used with schedule parameter). Example: 2025-11-04T00:00:00.000-05:00"
           },
           format: {
             type: "string",
-            description: "Report format (e.g., 'PDF', 'CSV', 'Excel')"
+            description: "Report output format (e.g., 'PDF', 'CSV', 'Excel')"
           },
           emailReport: {
             type: "boolean",
-            description: "Whether to send report via email"
+            description: "Whether to send the report via email"
           },
           emailSubject: {
             type: "string",
-            description: "Email subject line"
+            description: "Email subject line (only used if emailReport is true)"
           },
           emailRecipients: {
             type: "string",
-            description: "Comma-separated list of email recipients"
+            description: "Comma-separated list of email recipients (only used if emailReport is true)"
           },
           timePeriodStart: {
             type: "string",
-            description: "Custom time period start (ISO format)"
+            description: "Custom time period start date in ISO format (only used when timePeriod is 'Custom'). Format: 2025-11-04T00:00:00.000-05:00"
           },
           timePeriodEnd: {
             type: "string",
-            description: "Custom time period end (ISO format)"
+            description: "Custom time period end date in ISO format (only used when timePeriod is 'Custom'). Format: 2025-11-04T00:00:00.000-05:00"
           }
         },
         required: ["name"]
@@ -318,7 +318,7 @@ export function createReportTools(client: ArcApiClient) {
 
     {
       name: "update_report",
-      description: "Update an existing Arc report configuration",
+      description: "Update an existing Arc report configuration. The Columns parameter is critical - include the metrics you want to see in the report (e.g., TransactionsSent, TransactionsReceived, TotalProcessingTime, TransactionsSuccess, TransactionsError).",
       inputSchema: {
         type: "object",
         properties: {
@@ -328,63 +328,63 @@ export function createReportTools(client: ArcApiClient) {
           },
           type: {
             type: "string",
-            description: "Type of report (e.g., 'Summary', 'Detailed', 'Transaction')"
+            description: "Type of report. Valid values: 'Connector', 'EDI'"
           },
           timePeriod: {
             type: "string",
-            description: "Time period in days (e.g., '7', '30', '90')"
+            description: "Time period for the report. Valid values: 'All', 'LastMonth', 'Last3Months', 'Last6Months', 'Last12Months', 'MonthToDate', 'QuarterToDate', 'YearToDate', 'SinceLastRun', 'Custom' (if using Custom, also set timePeriodStart and timePeriodEnd in format: 2025-11-04T00:00:00.000-05:00)"
           },
           columns: {
             type: "string",
-            description: "Comma-separated list of columns to include"
+            description: "CRITICAL: Comma-separated list of metrics to include in the report. Valid values: WorkspaceId, ConnectorId, ConnectorType, TransactionsAll, TransactionsSent, TransactionsReceived, TotalProcessingTime, TotalFileSize, TransactionsSuccess, TransactionsError, TransactionsWarning. Always include relevant columns based on what the user is asking for."
           },
           groupRows: {
             type: "string",
-            description: "Columns to group by in the report"
+            description: "Comma-separated list of dimensions to group the report by. Valid values: Year, Quarter, Month, Week, WorkspaceId, ConnectorType"
           },
           filters: {
             type: "string",
-            description: "Filter criteria (e.g., 'ConnectorType=SFTP,FTP;ConnectorId=SFTP1')"
+            description: "Filters to apply to the report. Use ConnectorType (e.g., 'AS2', 'SFTP', 'FTP') and/or ConnectorId. Example: 'ConnectorType=AS2' or 'ConnectorType=SFTP,FTP;ConnectorId=SFTP1,SFTP2'"
           },
           summary: {
             type: "string",
-            description: "Summary information to include in the report"
+            description: "Summary statistics to include. Valid values: Total, Average, Minimum, Maximum"
           },
           schedule: {
             type: "string",
-            description: "Cron schedule expression for automated reports"
+            description: "Cron expression for automated report scheduling. Format: 'minute hour day month dayOfWeek'. Example: '30 15 1 * *' runs on the 1st of each month at 15:30"
           },
           startDate: {
             type: "string",
-            description: "Schedule start date (ISO format)"
+            description: "Schedule start date in ISO format (only used with schedule parameter). Example: 2025-11-04T00:00:00.000-05:00"
           },
           endDate: {
             type: "string",
-            description: "Schedule end date (ISO format)"
+            description: "Schedule end date in ISO format (only used with schedule parameter). Example: 2025-11-04T00:00:00.000-05:00"
           },
           format: {
             type: "string",
-            description: "Report format (e.g., 'PDF', 'CSV', 'Excel')"
+            description: "Report output format (e.g., 'PDF', 'CSV', 'Excel')"
           },
           emailReport: {
             type: "boolean",
-            description: "Whether to send report via email"
+            description: "Whether to send the report via email"
           },
           emailSubject: {
             type: "string",
-            description: "Email subject line"
+            description: "Email subject line (only used if emailReport is true)"
           },
           emailRecipients: {
             type: "string",
-            description: "Comma-separated list of email recipients"
+            description: "Comma-separated list of email recipients (only used if emailReport is true)"
           },
           timePeriodStart: {
             type: "string",
-            description: "Custom time period start (ISO format)"
+            description: "Custom time period start date in ISO format (only used when timePeriod is 'Custom'). Format: 2025-11-04T00:00:00.000-05:00"
           },
           timePeriodEnd: {
             type: "string",
-            description: "Custom time period end (ISO format)"
+            description: "Custom time period end date in ISO format (only used when timePeriod is 'Custom'). Format: 2025-11-04T00:00:00.000-05:00"
           }
         },
         required: ["name"]
