@@ -13,7 +13,7 @@ import { ArcApiClient } from './services/arc-client.js';
 import { createConnectorTools } from './tools/connector-tools.js';
 import { createFileTools } from './tools/file-tools.js';
 import { createMonitoringTools } from './tools/monitoring-tools.js';
-import { createConfigurationTools } from './tools/config-tools.js';
+import { createProfileTools } from './tools/profile-tools.js';
 import { createCertificateTools } from './tools/certificate-tools.js';
 import { createReportTools } from './tools/report-tools.js';
 import { createRequestTools } from './tools/request-tools.js';
@@ -67,7 +67,7 @@ function getTools(): any[] {
       ...createConnectorTools(arcClient),
       ...createFileTools(arcClient),
       ...createMonitoringTools(arcClient),
-      ...createConfigurationTools(arcClient),
+      ...createProfileTools(arcClient),
       ...createCertificateTools(arcClient),
       ...createReportTools(arcClient),
       ...createRequestTools(arcClient),

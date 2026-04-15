@@ -2,7 +2,7 @@
     "openapi": "3.0.1",
     "info": {
         "title": "RSSBus OpenAPI",
-        "version": "25.3.9393.0"
+        "version": "26.2.9600.0"
     },
     "servers": [
         {
@@ -1040,7 +1040,7 @@
                 ]
             }
         },
-        "/files(ConnectorId='{ConnectorId}',Folder='{Folder}',Filename='{Filename}',MessageId='{MessageId}')": {
+        "/files(ConnectorId='{ConnectorId}',Filename='{Filename}',Folder='{Folder}')": {
             "get": {
                 "summary": "Return a single files",
                 "description": "Returns a single files object using the specified key.",
@@ -1059,15 +1059,6 @@
                         }
                     },
                     {
-                        "name": "Folder",
-                        "in": "path",
-                        "description": "The key Folder",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "Filename",
                         "in": "path",
                         "description": "The key Filename",
@@ -1077,9 +1068,9 @@
                         }
                     },
                     {
-                        "name": "MessageId",
+                        "name": "Folder",
                         "in": "path",
-                        "description": "The key MessageId",
+                        "description": "The key Folder",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -1146,15 +1137,6 @@
                         }
                     },
                     {
-                        "name": "Folder",
-                        "in": "path",
-                        "description": "The key Folder",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "Filename",
                         "in": "path",
                         "description": "The key Filename",
@@ -1164,9 +1146,9 @@
                         }
                     },
                     {
-                        "name": "MessageId",
+                        "name": "Folder",
                         "in": "path",
-                        "description": "The key MessageId",
+                        "description": "The key Folder",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -1240,15 +1222,6 @@
                         }
                     },
                     {
-                        "name": "Folder",
-                        "in": "path",
-                        "description": "The key Folder",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "Filename",
                         "in": "path",
                         "description": "The key Filename",
@@ -1258,9 +1231,9 @@
                         }
                     },
                     {
-                        "name": "MessageId",
+                        "name": "Folder",
                         "in": "path",
-                        "description": "The key MessageId",
+                        "description": "The key Folder",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -1296,7 +1269,7 @@
                 ]
             }
         },
-        "/files(ConnectorId='{ConnectorId}',Folder='{Folder}',Filename='{Filename}',MessageId='{MessageId}')/{propertyName}/$value": {
+        "/files(ConnectorId='{ConnectorId}',Filename='{Filename}',Folder='{Folder}')/{propertyName}/$value": {
             "get": {
                 "summary": "Return specified property value of specified files",
                 "description": "Returns property value of files object using the specified key and property name.",
@@ -1315,15 +1288,6 @@
                         }
                     },
                     {
-                        "name": "Folder",
-                        "in": "path",
-                        "description": "The key Folder",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "Filename",
                         "in": "path",
                         "description": "The key Filename",
@@ -1333,9 +1297,289 @@
                         }
                     },
                     {
-                        "name": "MessageId",
+                        "name": "Folder",
                         "in": "path",
-                        "description": "The key MessageId",
+                        "description": "The key Folder",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "propertyName",
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The property name",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The property value",
+                        "content": {
+                            "text/plain; charset=utf-8": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "text/plain; charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
+        "/flowAPIs": {
+            "get": {
+                "summary": "Return flowAPIs",
+                "description": "Returns records from the flowAPIs entity that match the specified query parameters.  All records will be returned when no parameters are specified.",
+                "tags": [
+                    "flowAPIs"
+                ],
+                "operationId": "getAllflowAPIs",
+                "parameters": [
+                    {
+                        "name": "$select",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "A comma-separated list of properties to include in the results. When this field is left empty, all properties will be returned."
+                    },
+                    {
+                        "name": "$orderby",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Order the results by this property in ascending or descending order.  Example for ascending: 'Name ASC' Example for descending: 'Name DESC'"
+                    },
+                    {
+                        "name": "$top",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "The number of results to return."
+                    },
+                    {
+                        "name": "$skip",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "This is the offset of results to skip when returning results."
+                    },
+                    {
+                        "name": "$count",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "description": "When set, the results will return a count of results and not the actual results."
+                    },
+                    {
+                        "name": "$filter",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Use this to filter the results by specific property values. For example, you can use the following filter to retrieve records with the name 'John': $filter=Name eq 'John'"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "flowAPIs response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "value": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/flowAPIs"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
+        "/flowAPIs/$count": {
+            "get": {
+                "summary": "Return count of flowAPIs",
+                "description": "Returns count of records from the flowAPIs entity that match the specified query parameters.  All count will be returned when no parameters are specified.",
+                "tags": [
+                    "flowAPIs"
+                ],
+                "operationId": "getflowAPIsCount",
+                "parameters": [
+                    {
+                        "name": "$filter",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Use this to filter the results by specific property values. For example, you can use the following filter to retrieve records with the name 'John': $filter=Name eq 'John'"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The count",
+                        "content": {
+                            "text/plain; charset=utf-8": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "int32"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "text/plain; charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
+        "/flowAPIs('{WorkspaceId}')": {
+            "get": {
+                "summary": "Return a single flowAPIs",
+                "description": "Returns a single flowAPIs object using the specified key.",
+                "tags": [
+                    "flowAPIs"
+                ],
+                "operationId": "getflowAPIs",
+                "parameters": [
+                    {
+                        "name": "WorkspaceId",
+                        "in": "path",
+                        "description": "The key WorkspaceId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "$select",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Select structural property"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "flowAPIs response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/flowAPIs"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
+        "/flowAPIs('{WorkspaceId}')/{propertyName}/$value": {
+            "get": {
+                "summary": "Return specified property value of specified flowAPIs",
+                "description": "Returns property value of flowAPIs object using the specified key and property name.",
+                "tags": [
+                    "flowAPIs"
+                ],
+                "operationId": "getflowAPIsProperty",
+                "parameters": [
+                    {
+                        "name": "WorkspaceId",
+                        "in": "path",
+                        "description": "The key WorkspaceId",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -1459,67 +1703,6 @@
                                             }
                                         }
                                     }
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Unexpected error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/CDataError"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "basic": []
-                    },
-                    {
-                        "authtoken_header": []
-                    },
-                    {
-                        "authtoken_query": []
-                    }
-                ]
-            },
-            "post": {
-                "summary": "Create a new log entry",
-                "description": "Creates a new log entry in the logs entity.",
-                "tags": [
-                    "logs"
-                ],
-                "operationId": "createlogs",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/logs"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Log entry created successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/logs"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/CDataError"
                                 }
                             }
                         }
@@ -1881,89 +2064,12 @@
                 ],
                 "operationId": "updateprofile",
                 "requestBody": {
-                    "description": "The profile entity to update. You can update any configuration property by its key name.",
+                    "description": "The profile entity to update.",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "type": "object",
-                                "description": "Profile configuration object for OData updates using Pascal case properties",
-                                "required": ["@odata.type"],
-                                "additionalProperties": true,
-                                "properties": {
-                                    "@odata.type": {
-                                        "type": "string",
-                                        "description": "Required OData type identifier",
-                                        "enum": ["CDataAPI.Profile"]
-                                    },
-                                    "NotifyEmailFrom": {
-                                        "type": "string",
-                                        "description": "The sender of notification emails"
-                                    },
-                                    "NotifyEmail": {
-                                        "type": "string",
-                                        "description": "The receiver of notification emails"
-                                    },
-                                    "NotifyEmailTo": {
-                                        "type": "string",
-                                        "description": "The receiver of notification emails"
-                                    },
-                                    "SMTPServer": {
-                                        "type": "string",
-                                        "description": "The host name or IP address of your SMTP server"
-                                    },
-                                    "SMTPUser": {
-                                        "type": "string",
-                                        "description": "The username to authenticate to your SMTP server"
-                                    },
-                                    "SMTPPort": {
-                                        "type": "string",
-                                        "description": "The port of your SMTP server"
-                                    },
-                                    "SMTPSSLMode": {
-                                        "type": "string",
-                                        "description": "The SSL mode of your SMTP server"
-                                    },
-                                    "AS4PartyID": {
-                                        "type": "string",
-                                        "description": "The Party ID for AS4 messaging profile configuration"
-                                    },
-                                    "SSOEnabled": {
-                                        "type": "string",
-                                        "description": "Indicates whether Single Sign-On (SSO) is enabled"
-                                    },
-                                    "ProxyHost": {
-                                        "type": "string",
-                                        "description": "The host name or IP address of the proxy"
-                                    },
-                                    "ProxyPort": {
-                                        "type": "string",
-                                        "description": "The port of your proxy"
-                                    },
-                                    "ProxyType": {
-                                        "type": "string",
-                                        "description": "The type of proxy to connect through"
-                                    },
-                                    "SyslogRemoteHost": {
-                                        "type": "string",
-                                        "description": "The remote host of sysLog server"
-                                    },
-                                    "SyslogRemotePort": {
-                                        "type": "string",
-                                        "description": "The remote port of sysLog server"
-                                    },
-                                    "UITimeFormat": {
-                                        "type": "string",
-                                        "description": "Select the time format display preference (12 or 24)"
-                                    }
-                                },
-                                "example": {
-                                    "@odata.type": "CDataAPI.Profile",
-                                    "NotifyEmail": "foo@bar.com",
-                                    "NotifyEmailFrom": "admin@example.com",
-                                    "SMTPServer": "smtp.gmail.com",
-                                    "AS4PartyID": "mycompany"
-                                }
+                                "$ref": "#/components/schemas/profile"
                             }
                         }
                     }
@@ -2230,6 +2336,244 @@
                                 "schema": {
                                     "type": "string",
                                     "format": "int32"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "text/plain; charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
+        "/reports('{Name}')": {
+            "get": {
+                "summary": "Return a single reports",
+                "description": "Returns a single reports object using the specified key.",
+                "tags": [
+                    "reports"
+                ],
+                "operationId": "getreports",
+                "parameters": [
+                    {
+                        "name": "Name",
+                        "in": "path",
+                        "description": "The key Name",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "$select",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Select structural property"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "reports response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/reports"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            },
+            "put": {
+                "summary": "Update reports",
+                "description": "Updates the specified reports object.",
+                "tags": [
+                    "reports"
+                ],
+                "operationId": "updatereports",
+                "parameters": [
+                    {
+                        "name": "Name",
+                        "in": "path",
+                        "description": "The key Name",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "The reports entity to update.",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/reports"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "EntitySet reports",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/reports"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "reports updated",
+                        "content": {}
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            },
+            "delete": {
+                "summary": "Delete reports",
+                "description": "Deletes the specified reports object.",
+                "tags": [
+                    "reports"
+                ],
+                "operationId": "deletereports",
+                "parameters": [
+                    {
+                        "name": "Name",
+                        "in": "path",
+                        "description": "The key Name",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "reports deleted",
+                        "content": {}
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
+        "/reports('{Name}')/{propertyName}/$value": {
+            "get": {
+                "summary": "Return specified property value of specified reports",
+                "description": "Returns property value of reports object using the specified key and property name.",
+                "tags": [
+                    "reports"
+                ],
+                "operationId": "getreportsProperty",
+                "parameters": [
+                    {
+                        "name": "Name",
+                        "in": "path",
+                        "description": "The key Name",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "propertyName",
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The property name",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The property value",
+                        "content": {
+                            "text/plain; charset=utf-8": {
+                                "schema": {
+                                    "type": "string"
                                 }
                             }
                         }
@@ -3802,8 +4146,8 @@
         },
         "/cleanup": {
             "post": {
-                "summary": "Cleans up log files for the specified workspaces and connectors.",
-                "description": "Cleans up log files for the specified workspaces and connectors.",
+                "summary": "Archive or delete log files, transaction entries in the database, and, optionally, files in the Send, Sent, and Received folders, for the specified workspaces and connectors.",
+                "description": "Archive or delete log files, transaction entries in the database, and, optionally, files in the Send, Sent, and Received folders, for the specified workspaces and connectors.",
                 "tags": [
                     "cleanup"
                 ],
@@ -3846,8 +4190,8 @@
         },
         "/copyConnector": {
             "post": {
-                "summary": "This action will copy the connector settings to a new connector based on the newly specified Id.",
-                "description": "This action will copy the connector settings to a new connector based on the newly specified Id.",
+                "summary": "Copies connector settings from an existing connector to a new connector.",
+                "description": "Copies connector settings from an existing connector to a new connector.",
                 "tags": [
                     "copyConnector"
                 ],
@@ -3898,8 +4242,8 @@
         },
         "/copyWorkspace": {
             "post": {
-                "summary": "This action will copy all connectors from the specified WorkspaceId to a new workspace.",
-                "description": "This action will copy all connectors from the specified WorkspaceId to a new workspace.",
+                "summary": "Copies the workspace settings and all connectors from an existing workspace to a new workspace.",
+                "description": "Copies the workspace settings and all connectors from an existing workspace to a new workspace.",
                 "tags": [
                     "copyWorkspace"
                 ],
@@ -3950,8 +4294,8 @@
         },
         "/createCert": {
             "post": {
-                "summary": "Create the public/private certificate key pair.",
-                "description": "Create the public/private certificate key pair.",
+                "summary": "Creates a public/private certificate key pair that can be used for encryption, signing, decryption, verification, SSL/TLS, and so on.",
+                "description": "Creates a public/private certificate key pair that can be used for encryption, signing, decryption, verification, SSL/TLS, and so on.",
                 "tags": [
                     "createCert"
                 ],
@@ -4002,8 +4346,8 @@
         },
         "/exchangeCert": {
             "post": {
-                "summary": "Exchange the specified certificate.",
-                "description": "Exchange the specified certificate.",
+                "summary": "Exchange the specified certificate with a trading partner. Only applicable for AS2 and OFTP connectors.",
+                "description": "Exchange the specified certificate with a trading partner. Only applicable for AS2 and OFTP connectors.",
                 "tags": [
                     "exchangeCert"
                 ],
@@ -4047,8 +4391,8 @@
         },
         "/export": {
             "post": {
-                "summary": "Export the connector settings.",
-                "description": "Export the connector settings.",
+                "summary": "Creates an arcflow configuration file that includes profiles settings, connector settings, and/or workspace settings.",
+                "description": "Creates an arcflow configuration file that includes profiles settings, connector settings, and/or workspace settings.",
                 "tags": [
                     "export"
                 ],
@@ -4096,10 +4440,62 @@
                 ]
             }
         },
+        "/exportDataEncryptionKey": {
+            "post": {
+                "summary": "Exports the master encryption key as an encrypted data block that contains the data encryption key and its associated cryptographic metadata.",
+                "description": "Exports the master encryption key as an encrypted data block that contains the data encryption key and its associated cryptographic metadata.",
+                "tags": [
+                    "exportDataEncryptionKey"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/exportDataEncryptionKey_input"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "The action result",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/exportDataEncryptionKey_output"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
         "/getMessageCount": {
             "post": {
-                "summary": "Get the unsend messages count of each connector.",
-                "description": "Get the unsend messages count of each connector.",
+                "summary": "Retrieve the unsent messages count for connectors (the count of all messages in the Send folder).",
+                "description": "Retrieve the unsent messages count for connectors (the count of all messages in the Send folder).",
                 "tags": [
                     "getMessageCount"
                 ],
@@ -4149,8 +4545,8 @@
         },
         "/getTransactionLogs": {
             "post": {
-                "summary": "Retrieves the transaction details of the application.",
-                "description": "Retrieves the transaction details of the application.",
+                "summary": "Retrieves the transaction logs for a specific transaction, optionally including the log content.",
+                "description": "Retrieves the transaction logs for a specific transaction, optionally including the log content.",
                 "tags": [
                     "getTransactionLogs"
                 ],
@@ -4201,8 +4597,8 @@
         },
         "/import": {
             "post": {
-                "summary": "This action will import partner/connector profiles from previous versions of the application.",
-                "description": "This action will import partner/connector profiles from previous versions of the application.",
+                "summary": "Import workspaces, connectors and profiles from a configuration arcflow file.",
+                "description": "Import workspaces, connectors and profiles from a configuration arcflow file.",
                 "tags": [
                     "import"
                 ],
@@ -4243,10 +4639,62 @@
                 ]
             }
         },
+        "/importDataEncryptionKey": {
+            "post": {
+                "summary": "Imports an encryption key (typically exported from a production environment) into a development or test instance, enabling the development environment to decrypt configuration data and credentials from production backups or imports.",
+                "description": "Imports an encryption key (typically exported from a production environment) into a development or test instance, enabling the development environment to decrypt configuration data and credentials from production backups or imports.",
+                "tags": [
+                    "importDataEncryptionKey"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/importDataEncryptionKey_input"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "The action result",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/importDataEncryptionKey_output"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
         "/receiveFile": {
             "post": {
-                "summary": "Download files for this connector.",
-                "description": "Download files for this connector.",
+                "summary": "Triggers the Receive action for a specific connector to receive one or more specified file(s).",
+                "description": "Triggers the Receive action for a specific connector to receive one or more specified file(s).",
                 "tags": [
                     "receiveFile"
                 ],
@@ -4257,7 +4705,8 @@
                                 "$ref": "#/components/schemas/receiveFile_input"
                             }
                         }
-                    }
+                    },
+                    "required": true
                 },
                 "responses": {
                     "200": {
@@ -4294,10 +4743,55 @@
                 ]
             }
         },
+        "/requeueMessage": {
+            "post": {
+                "summary": "Moves a message back into the connector's Send folder so it can be processed again. Use this to retry messages that failed or need to be reprocessed.",
+                "description": "Moves a message back into the connector's Send folder so it can be processed again. Use this to retry messages that failed or need to be reprocessed.",
+                "tags": [
+                    "requeueMessage"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/requeueMessage_input"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "The action result"
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
         "/sendFile": {
             "post": {
-                "summary": "Sends a file using the specified connector.",
-                "description": "Sends a file using the specified connector.",
+                "summary": "Instructs a specific connector to process (upload, send, transform, and so on) a file in that connector's Send folder.",
+                "description": "Instructs a specific connector to process (upload, send, transform, and so on) a file in that connector's Send folder.",
                 "tags": [
                     "sendFile"
                 ],
@@ -4308,7 +4802,8 @@
                                 "$ref": "#/components/schemas/sendFile_input"
                             }
                         }
-                    }
+                    },
+                    "required": true
                 },
                 "responses": {
                     "200": {
@@ -4352,64 +4847,72 @@
                 "type": "object",
                 "properties": {
                     "Name": {
-                        "description": "The name of the certificate file.",
+                        "description": "The certificate file name, such as myCert.pfx or publicCert.pub.",
                         "type": "string"
                     },
                     "Data": {
-                        "description": "The base-64 encoded contents of the certificate file.",
+                        "description": "The Base64-encoded contents of the certificate file. Required when using POST to create a certificate. It must contain all properties you want to include in the certificate. ",
                         "type": "string"
                     },
-                    "StoreType": {
-                        "description": "The store type.",
+                    "ConnectorIds": {
+                        "description": "A list of all connector Ids that are configured to use the certificate. This and the following readonly parameters provide an explanation of the properties that are included in the response from the API. You cannot use them to set properties when creating a certificate. All properties except Name must be defined in the Data parameter.",
                         "type": "string"
                     },
-                    "Subject": {
-                        "description": "The certificate subject.",
-                        "type": "string"
-                    },
-                    "Issuer": {
-                        "description": "The issuer of the certificate.",
-                        "type": "string"
-                    },
-                    "IssuedTo": {
-                        "description": "The common name of certificate subject.",
-                        "type": "string"
-                    },
-                    "IssuedBy": {
-                        "description": "The common name of certificate issuer.",
-                        "type": "string"
-                    },
-                    "EffectiveDate": {
-                        "description": "The effective date of the certificate.",
-                        "type": "string"
-                    },
-                    "ExpirationDate": {
-                        "description": "The expiration date of the certificate.",
-                        "type": "string"
-                    },
-                    "ExpirationDays": {
-                        "description": "The days until the expiration date of the certificate.",
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "Serialnumber": {
-                        "description": "The serial number of the certificate.",
-                        "type": "string"
-                    },
-                    "Thumbprint": {
-                        "description": "The SHA1 thumbprint of the certificate.",
-                        "type": "string"
-                    },
-                    "Keysize": {
-                        "description": "The key size of the certificate.",
+                    "Category": {
+                        "description": "The certificate category (Public or Private).",
                         "type": "string"
                     },
                     "SignatureAlgorithm": {
                         "description": "The algorithm used to sign the certificate.",
                         "type": "string"
                     },
-                    "ConnectorIds": {
-                        "description": "The Id list of the connector configured to use the certificate.",
+                    "Serialnumber": {
+                        "description": "The certificate serial number.",
+                        "type": "string"
+                    },
+                    "ExpirationDate": {
+                        "description": "The date on which the certificate expires.",
+                        "type": "string"
+                    },
+                    "EffectiveDate": {
+                        "description": "The effective date of the certificate.",
+                        "type": "string"
+                    },
+                    "Keysize": {
+                        "description": "The certificate key size.",
+                        "type": "string"
+                    },
+                    "AssociatedResource": {
+                        "description": "The list of connectors, profiles, and shared connections configured to use the certificate.",
+                        "type": "string"
+                    },
+                    "Issuer": {
+                        "description": "The certificate issuer.",
+                        "type": "string"
+                    },
+                    "Subject": {
+                        "description": "The certificate subject.",
+                        "type": "string"
+                    },
+                    "IssuedBy": {
+                        "description": "The common name (CN) of the certificate issuer.",
+                        "type": "string"
+                    },
+                    "ExpirationDays": {
+                        "description": "The number of days until the certificate expires.",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "IssuedTo": {
+                        "description": "The CN of the certificate subject.",
+                        "type": "string"
+                    },
+                    "Thumbprint": {
+                        "description": "The certificate SHA1 thumbprint.",
+                        "type": "string"
+                    },
+                    "StoreType": {
+                        "description": "The store type, such as PFX, Private, or Public.",
                         "type": "string"
                     }
                 },
@@ -4421,80 +4924,84 @@
                 "type": "object",
                 "properties": {
                     "ConnectorId": {
-                        "description": "The id of the connector.",
+                        "description": "The connector Id.",
                         "type": "string"
                     },
                     "WorkspaceId": {
-                        "description": "The workspace of the connector.",
+                        "description": "The workspace that the connector belongs to.",
                         "type": "string"
                     },
                     "ConnectorType": {
-                        "description": "The type of the connector.",
+                        "description": "The connector type, such as AS2, X12, or MySQL.",
                         "type": "string"
                     },
                     "AutomationSend": {
-                        "description": "When set to True, the connector will automatically process files in the Send folder.",
+                        "description": "When set to True, the connector automatically processes files in the Send folder.",
                         "type": "boolean"
                     },
                     "AutomationRetryInterval": {
-                        "description": "The length of time that the application will wait after an error, in minutes, before attempting to send the file again. If set to 0, the connector will attempt to retry the file every interval.",
+                        "description": "The length of time that the application waits after an error, in minutes, before trying to send the file again. When set to 0, the connector tries to send the file every interval.",
                         "type": "integer",
                         "format": "int32"
                     },
                     "AutomationMaxAttempts": {
-                        "description": "The maximum number of times that the connector will attempt to process the input file in the event that failures are encountered. If set to 0, the connector will attempt to retry the file indefinitely.",
+                        "description": "The maximum number of times that the connector tries to process the input file in the event that failures are encountered. When set to 0, the connector retries the file indefinitely.",
                         "type": "integer",
                         "format": "int32"
                     },
                     "AutomationReceive": {
-                        "description": "When set to True, the connector will attempt to automatically receive files at the specified ReceiveInterval.",
+                        "description": "When set to True, the connector tries to automatically receive files at the specified ReceiveInterval.",
                         "type": "boolean"
                     },
                     "ReceiveInterval": {
-                        "description": "The interval at which the connector will attempt to receive files if AutomationReceive is set to True.",
+                        "description": "The interval at which the connector tries to receive files if AutomationReceive is set to True.",
                         "type": "string"
                     },
                     "MaxWorkers": {
-                        "description": "The maximum number of workers to assign from the worker pool when processing files on this connector. If not set, the default setting from the Settings tab of the application will be used.",
+                        "description": "The maximum number of workers to assign from the worker pool when processing files on this connector. If not set, the default setting from the Settings tab of the application is used.",
                         "type": "integer",
                         "format": "int32"
                     },
                     "MaxFiles": {
-                        "description": "The maximum number of files that will be processed for this connector each time workers are assigned to this connector. If not set, the default setting from the Settings tab of the application will be used.",
+                        "description": "The maximum number of files that are processed for this connector each time workers are assigned to this connector. If not set, the default setting from the Settings tab of the application is used.",
                         "type": "integer",
                         "format": "int32"
                     },
                     "SendFolder": {
-                        "description": "This is the folder where the connector will pick up files to be processed.",
+                        "description": "The folder where the connector picks up files to be processed.",
                         "type": "string"
                     },
                     "ReceiveFolder": {
-                        "description": "This is the folder where the connector will place received files.",
+                        "description": "The folder where the connector places received files.",
                         "type": "string"
                     },
                     "SentFolder": {
-                        "description": "This is the folder where the connector will place files after they have been processed.",
+                        "description": "The folder where the connector places files after they have been processed.",
                         "type": "string"
                     },
                     "SaveToSentFolder": {
-                        "description": "When set to True, the connector will keep a copy of sent messages in the Sent folder.",
+                        "description": "When set to True, the connector keeps a copy of sent messages in the Sent folder.",
                         "type": "boolean"
                     },
                     "SentFolderScheme": {
-                        "description": "This setting governs the subfolder structure that is used within the Sent folder. Available values are Daily, Weekly, Monthly, and Yearly.",
+                        "description": "Instructs the connector to group files in the Sent folder according to the selected interval. Available values are 'yyyy-MM-dd, @weekly, yyyy-MM, yyyy', corresponding to daily, weekly, monthly, and yearly.",
                         "type": "string"
                     },
                     "LogLevel": {
-                        "description": "The log level used when writing transcation logs. Available values are None, Error, Warning, Info, Debug, and Trace.",
+                        "description": "The verbosity of logs generated when writing transcation logs. Available values are 'None, Error, Warning, Info, Debug, Trace'.",
                         "type": "string"
                     },
                     "LogSubFolderScheme": {
-                        "description": "This setting governs the subfolder structure that is used within the Logs folder. Available values are Daily, Weekly, Monthly, and Yearly.",
+                        "description": "Instructs the connector to group files in the Logs folder according to the selected interval. Available values are 'yyyy-MM-dd, @weekly, yyyy-MM, yyyy', corresponding to daily, weekly, monthly, and yearly.",
                         "type": "string"
                     },
                     "LogMessages": {
-                        "description": "When checked, the connector will keep a copy of the message next to the logs for the message in the Logs directory.",
+                        "description": "When set to True, the connector keeps a copy of the message with the message logs in the Logs directory.",
                         "type": "boolean"
+                    },
+                    "Other": {
+                        "description": "The list of properties above is not comprehensive. You can use the API to set any property not listed above on a connector, using the same name/value format. All available connector default properties are returned in a GET request.",
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -4505,23 +5012,15 @@
                 "type": "object",
                 "properties": {
                     "ConnectorId": {
-                        "description": "The id of the connector.",
-                        "type": "string"
-                    },
-                    "PortId": {
-                        "description": "The id of the port.",
-                        "type": "string"
-                    },
-                    "Folder": {
-                        "description": "The folder of the file.",
+                        "description": "The connector Id.",
                         "type": "string"
                     },
                     "Filename": {
                         "description": "The name of the file.",
                         "type": "string"
                     },
-                    "MessageId": {
-                        "description": "The message id of the file. This will only have a value if the file is a message.",
+                    "Folder": {
+                        "description": "Which folder the file is in.",
                         "type": "string"
                     },
                     "Subfolder": {
@@ -4533,62 +5032,125 @@
                         "type": "string",
                         "format": "date-time"
                     },
-                    "FilePath": {
-                        "description": "The full path to the file.",
-                        "type": "string"
-                    },
-                    "FileSize": {
-                        "description": "The size of the file.",
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "Content": {
-                        "description": "The Base64 encode file contents. This will only be returned when a specific file is requested. This field cannot be used when filtering results using the $filter parameter.",
+                    "PortId": {
+                        "description": "The port Id.",
                         "type": "string"
                     },
                     "BatchGroupId": {
-                        "description": "The batch group message Id.",
+                        "description": "The batch group message Id. Null unless the file is a batch group.",
+                        "type": "string"
+                    },
+                    "MessageId": {
+                        "description": "The file message Id. This only has a value when the file is a message.",
                         "type": "string"
                     },
                     "IsBatchGroup": {
-                        "description": "Whether it is a batch group message or not?",
+                        "description": "Whether the message is a batch group message.",
                         "type": "boolean"
+                    },
+                    "Content": {
+                        "description": "The Base64-encoded file contents. This is only returned when you request a specific file. You cannot use this field when filtering results with the $filter parameter. You must provide either Content or InputName: they cannot both be null.",
+                        "type": "string"
+                    },
+                    "FileSize": {
+                        "description": "The file size in bytes.",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "FilePath": {
+                        "description": "The full path to the file.",
+                        "type": "string"
                     }
                 },
                 "required": [
                     "ConnectorId",
-                    "Folder",
                     "Filename",
-                    "MessageId"
+                    "Folder"
+                ]
+            },
+            "flowAPIs": {
+                "type": "object",
+                "properties": {
+                    "WorkspaceId": {
+                        "description": "The Id of the workspace that contains the flow API.",
+                        "type": "string"
+                    },
+                    "Name": {
+                        "description": "The name of the flow API.",
+                        "type": "string"
+                    },
+                    "Description": {
+                        "description": "The description of the flow API.",
+                        "type": "string"
+                    },
+                    "Method": {
+                        "description": "The HTTP method supported by the flow API.",
+                        "type": "string"
+                    },
+                    "Connectors": {
+                        "description": "The list of connector Ids associated with the flow API.",
+                        "type": "string"
+                    },
+                    "QueryParameters": {
+                        "description": "The colon-delimited list of query parameter names.",
+                        "type": "string"
+                    },
+                    "BodyType": {
+                        "description": "The data type of the HTTP request body.",
+                        "type": "string"
+                    },
+                    "RequestContentType": {
+                        "description": "The content type of the HTTP request.",
+                        "type": "string"
+                    },
+                    "RequestBody": {
+                        "description": "The colon-delimited list of key names when the body type is Form-Data or x-www-form-urlencoded.",
+                        "type": "string"
+                    },
+                    "ResponseContentType": {
+                        "description": "The content type of the HTTP response.",
+                        "type": "string"
+                    },
+                    "RequestSample": {
+                        "description": "The sample request data when the body type is Raw.",
+                        "type": "string"
+                    },
+                    "ResponseSample": {
+                        "description": "The sample response data.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "WorkspaceId"
                 ]
             },
             "logs": {
                 "type": "object",
                 "properties": {
                     "Id": {
-                        "description": "The Id of the log message.",
+                        "description": "The Id of the log event.",
+                        "type": "string"
+                    },
+                    "Script": {
+                        "description": "The resource causing the log entry. This is the value of the Script column in the logs table when you view it in the UI or database.",
+                        "type": "string"
+                    },
+                    "InstanceId": {
+                        "description": "The machine name of the Arc instance that writes the log. Primarily used in high availability (HA) environments.",
                         "type": "string"
                     },
                     "Type": {
-                        "description": "The type of the log message.",
+                        "description": "The log message type.",
+                        "type": "string"
+                    },
+                    "Message": {
+                        "description": "The message of the log event.",
                         "type": "string"
                     },
                     "Timestamp": {
                         "description": "The time when the event occurred.",
                         "type": "string",
                         "format": "date-time"
-                    },
-                    "Script": {
-                        "description": "The app causing the error.",
-                        "type": "string"
-                    },
-                    "Message": {
-                        "description": "The message.",
-                        "type": "string"
-                    },
-                    "InstanceId": {
-                        "description": "The host which writes the log in the HA environment.",
-                        "type": "string"
                     }
                 },
                 "required": [
@@ -4597,79 +5159,138 @@
             },
             "profile": {
                 "type": "object",
-                "description": "System configuration profile containing all application settings",
-                "additionalProperties": {
-                    "type": "string",
-                    "description": "Configuration setting value"
-                },
                 "properties": {
-                    "@odata.context": {
-                        "type": "string",
-                        "description": "OData context metadata"
+                    "AllowAuthTokenInURL": {
+                        "description": "When set to True, enables authentication tokens to be passed as URL query parameters instead of requiring header-based authentication.",
+                        "type": "boolean"
                     },
-                    "as4:partyid": {
-                        "type": "string",
-                        "description": "The Party ID for AS4 messaging profile configuration"
+                    "AutoTaskType": {
+                        "description": "The type of automated maintenance task to run.",
+                        "type": "string"
                     },
-                    "as4:partyidtype": {
-                        "type": "string",
-                        "description": "The Party ID type for AS4 messaging profile configuration"
+                    "AutoTaskInterval": {
+                        "description": "Defines how frequently (in days) the automated task executes.",
+                        "type": "string"
                     },
-                    "notifyemailfrom": {
-                        "type": "string",
-                        "description": "The sender of notification emails"
+                    "CleanupReceiveFolder": {
+                        "description": "Include files in Receive folders in cleanup operations.",
+                        "type": "boolean"
                     },
-                    "notifyemailto": {
-                        "type": "string",
-                        "description": "The receiver of notification emails"
+                    "CleanupSendFolder": {
+                        "description": "Include files in Send folders in cleanup operations.",
+                        "type": "boolean"
                     },
-                    "smtpserver": {
-                        "type": "string",
-                        "description": "The host name or IP address of your SMTP server"
+                    "CleanupSentFolder": {
+                        "description": "Include files in Sent folders in cleanup operations.",
+                        "type": "boolean"
                     },
-                    "smtpuser": {
-                        "type": "string",
-                        "description": "The username to authenticate to your SMTP server"
+                    "CleanupTransactions": {
+                        "description": "Include transactions in cleanup operations.",
+                        "type": "boolean"
                     },
-                    "smtppassword": {
-                        "type": "string",
-                        "description": "The password to authenticate to your SMTP server"
+                    "corsallowcredentials": {
+                        "description": "Allows cross-origin requests to include credentials such as cookies or authentication headers.",
+                        "type": "boolean"
                     },
-                    "smtpport": {
-                        "type": "string",
-                        "description": "The port of your SMTP server"
+                    "corsallowheaders": {
+                        "description": "Comma-separated list of HTTP headers that are permitted in cross-origin requests.",
+                        "type": "string"
                     },
-                    "smtpsslmode": {
-                        "type": "string",
-                        "description": "The SSL mode of your SMTP server"
+                    "corsmaxage": {
+                        "description": "Specifies how long (in seconds) browsers can cache Cross-Origin Resource Sharing (CORS) preflight request results before requiring a new preflight check.",
+                        "type": "string"
                     },
-                    "ssoenabled": {
-                        "type": "string",
-                        "description": "Indicates whether Single Sign-On (SSO) is enabled"
+                    "corsallowalldomains": {
+                        "description": "Enables all domains to make cross-origin requests to the API without restriction (use with caution as this removes CORS security protections).",
+                        "type": "boolean"
                     },
-                    "proxyhost": {
-                        "type": "string",
-                        "description": "The host name or IP address of the proxy"
+                    "enablecors": {
+                        "description": "Enables CORS to allow web applications from different domains to access the API.",
+                        "type": "boolean"
                     },
-                    "proxyport": {
-                        "type": "string",
-                        "description": "The port of your proxy"
+                    "MaxFilesPerPort": {
+                        "description": "The maximum number of files sent by each thread assigned to the connector.",
+                        "type": "string"
                     },
-                    "proxytype": {
-                        "type": "string",
-                        "description": "The type of proxy to connect through"
+                    "MaxWorkersPerPort": {
+                        "description": "The number of worker threads allocated to the connector for parallel processing.",
+                        "type": "string"
                     },
-                    "syslogremotehost": {
-                        "type": "string",
-                        "description": "The remote host of sysLog server"
+                    "NotifyEmail": {
+                        "description": "Send an email to the specified email addresses when an error is encountered.",
+                        "type": "string"
                     },
-                    "syslogremoteport": {
-                        "type": "string",
-                        "description": "The remote port of sysLog server"
+                    "NotifyEmailFrom": {
+                        "description": "The email address used as the sender of notification emails.",
+                        "type": "string"
+                    },
+                    "NotifyEmailTo": {
+                        "description": "A comma-separated list of notification email recipients.",
+                        "type": "string"
+                    },
+                    "NotifyEmailSubject": {
+                        "description": "The notification email subject.",
+                        "type": "string"
+                    },
+                    "NotifyWindowsEvent": {
+                        "description": "Whether to write error messages to the Windows Application Event Log.",
+                        "type": "boolean"
+                    },
+                    "NotifyStopStart": {
+                        "description": "Whether to log when the application starts and stops in the event log.",
+                        "type": "boolean"
+                    },
+                    "ProcessParallel": {
+                        "description": "Enables concurrent processing of multiple files instead of sequential processing.",
+                        "type": "boolean"
+                    },
+                    "SMTPServer": {
+                        "description": "The host name or IP address of your SMTP server.",
+                        "type": "string"
+                    },
+                    "SMTPUser": {
+                        "description": "The username to authenticate to your SMTP server.",
+                        "type": "string"
+                    },
+                    "SMTPPassword": {
+                        "description": "The password to authenticate to your SMTP server.",
+                        "type": "string"
+                    },
+                    "SMTPPort": {
+                        "description": "The port of your SMTP server.",
+                        "type": "string"
+                    },
+                    "SMTPSSLMode": {
+                        "description": "The SSL mode of your SMTP server.",
+                        "type": "string"
+                    },
+                    "SendStatusReport": {
+                        "description": "Whether to send a status report to the NotifyEmailTo email address(es).",
+                        "type": "boolean"
+                    },
+                    "SendReportInterval": {
+                        "description": "The interval at which status report are sent to the email address.",
+                        "type": "string"
+                    },
+                    "TrustedIp": {
+                        "description": "Commas-separated list of IP addresses or ranges that are trusted. Access to Arc is allowed from these addresses and ranges.",
+                        "type": "string"
+                    },
+                    "BlockedIp": {
+                        "description": "Commas-separated list of IP addresses or ranges that are blocked. Access to Arc is prohibited from these addresses and ranges.",
+                        "type": "string"
                     },
                     "uitimeformat": {
-                        "type": "string",
-                        "description": "Select the time format display preference"
+                        "description": "The time format display preference.",
+                        "type": "string"
+                    },
+                    "Workerpool": {
+                        "description": "The size of the thread pool available for processing tasks across all connectors.",
+                        "type": "string"
+                    },
+                    "Other": {
+                        "description": "The list of properties above is not comprehensive. You can use the API to set any profile property not listed above, using the same name/value format. All available profile default properties are returned in a GET request. Profile-specific settings, such as AS2 or SFTP, are prefixed like this: as2:loglevel or sftp:loglevel. You do not need to include an Other property when using additional settings that are not listed here.",
+                        "type": "string"
                     }
                 }
             },
@@ -4677,151 +5298,154 @@
                 "type": "object",
                 "properties": {
                     "Name": {
-                        "description": "The name of the report.",
+                        "description": "The report name.",
                         "type": "string"
                     },
-                    "Type": {
-                        "description": "The type of report.",
-                        "type": "string"
-                    },
-                    "CreatedBy": {
-                        "description": "Who created this report.",
+                    "Columns": {
+                        "description": "The columns in the report. Required when creating a new report. Available values include one or more of: 'WorkspaceId, ConnectorId, ConnectorType, Year, Quarter, Month, Week, SenderISAId, ReceiverISAId, TransactionSet, AllTransactions, TransactionsSent, TransactionsReceived, TotalProcessingTime, TotalFileSize, Successful, Error, Warning'.",
                         "type": "string"
                     },
                     "CreatedTime": {
-                        "description": "The time when created this report.",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "ModifiedTime": {
-                        "description": "The last modified time of report.",
+                        "description": "The time the report was created.",
                         "type": "string",
                         "format": "date-time"
                     },
                     "TimePeriod": {
-                        "description": "The time period that the report should pull data from. In days.",
+                        "description": "The time period, such as Last3Months or YearToDate, that the report uses to pull data. Available values are 'All, LastMonth, Last3Months, Last6Months, Last12Months, MonthToDate, QuarterToDate, YearToDate, SinceLastRun, Custom'.",
                         "type": "string"
                     },
-                    "Columns": {
-                        "description": "The columns in the report.",
+                    "Type": {
+                        "description": "The report type. Available values are 'Transactions, Application'.",
                         "type": "string"
                     },
-                    "GroupRows": {
-                        "description": "The rows to group by in the report.",
-                        "type": "string"
-                    },
-                    "Filters": {
-                        "description": "Any filters that should be used for the report. e.g. ConnectorType=SFTP,FTP;ConnectorId=SFTP1,SFTP2,FTP1,FTP2",
-                        "type": "string"
+                    "TimePeriodEnd": {
+                        "description": "If the TimePeriod is Custom, this is the report end time. For example: 2026-02-11T17:00:00.0000-07:00",
+                        "type": "string",
+                        "format": "date-time"
                     },
                     "Summary": {
-                        "description": "Any summary information that should be provided in the generated report.",
-                        "type": "string"
-                    },
-                    "Schedule": {
-                        "description": "The schedule cron.",
-                        "type": "string"
-                    },
-                    "StartDate": {
-                        "description": "The start date.",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "EndDate": {
-                        "description": "The end date.",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "Format": {
-                        "description": "The report format.",
+                        "description": "Any summary information, such as Total or Average, that should be included in the generated report.",
                         "type": "string"
                     },
                     "EmailReport": {
-                        "description": "Whether send report via email.",
+                        "description": "Whether to send the report via email.",
                         "type": "boolean"
                     },
-                    "EmailSubject": {
-                        "description": "The email subject.",
+                    "Filters": {
+                        "description": "Any filters that should be used for the report, such as ConnectorType=SFTP,FTP;ConnectorId=SFTP1,SFTP2,FTP1,FTP2.",
                         "type": "string"
                     },
-                    "EmailRecipients": {
-                        "description": "The email recipients.",
-                        "type": "string"
+                    "ModifiedTime": {
+                        "description": "The time the report was last modified.",
+                        "type": "string",
+                        "format": "date-time"
                     },
                     "TimePeriodStart": {
-                        "description": "The custom TimePeriod start time.",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "TimePeriodEnd": {
-                        "description": "The custom TimePeriod end time.",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "NextRunTime": {
-                        "description": "The next schedule time.",
+                        "description": "If the TimePeriod is Custom, this is the report start time.",
                         "type": "string",
                         "format": "date-time"
                     },
                     "IsRunning": {
-                        "description": "Whether the reports is running.",
+                        "description": "Whether the report is running.",
+                        "type": "string"
+                    },
+                    "EndDate": {
+                        "description": "For any TimePeriod other than Custom, this is the report end date in this format: YYYY-MM-DD. For example: 2026-01-28",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "CreatedBy": {
+                        "description": "The user who created the report.",
+                        "type": "string"
+                    },
+                    "GroupRows": {
+                        "description": "The rows, such as Week or ConnectorType, to group by in the report. Available values include one or more of: 'WorkspaceId, ConnectorCategory, ConnectorId, Year, Quarter, Month, Week, SenderISAId, ReceiverISAId, TransactionSet'.",
+                        "type": "string"
+                    },
+                    "EmailSubject": {
+                        "description": "If EmailReport is True, this is the email subject line.",
+                        "type": "string"
+                    },
+                    "NextRunTime": {
+                        "description": "The next time the report is scheduled to run.",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "Format": {
+                        "description": "The report format, such as CSV.",
+                        "type": "string"
+                    },
+                    "Schedule": {
+                        "description": "The cron schedule that controls when the report is run.",
+                        "type": "string"
+                    },
+                    "StartDate": {
+                        "description": "For any TimePeriod other than Custom, this is the report start date in this format: YYYY-MM-DD. For example: 2026-01-28",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "EmailRecipients": {
+                        "description": "If EmailReport is True, this is a comma-separated list of email recipients.",
                         "type": "string"
                     }
-                }
+                },
+                "required": [
+                    "Name"
+                ]
             },
             "requests": {
                 "type": "object",
                 "properties": {
                     "Id": {
-                        "description": "The Id of the request.",
-                        "type": "string"
-                    },
-                    "Timestamp": {
-                        "description": "The time when the request was handled.",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "URL": {
-                        "description": "The URL of the request.",
+                        "description": "The Id assigned to each request log entry for tracking and reference purposes.",
                         "type": "string"
                     },
                     "Method": {
-                        "description": "The HTTP method.",
+                        "description": "The HTTP method used for the request. Available values are 'GET, POST, PUT, DELETE'.",
                         "type": "string"
                     },
-                    "User": {
-                        "description": "The user.",
+                    "URL": {
+                        "description": "The complete URL path, including any query parameters but excluding the base domain.",
                         "type": "string"
-                    },
-                    "RemoteIP": {
-                        "description": "The remote IP address from the request.",
-                        "type": "string"
-                    },
-                    "Script": {
-                        "description": "The script.",
-                        "type": "string"
-                    },
-                    "Bytes": {
-                        "description": "The size of the request.",
-                        "type": "integer",
-                        "format": "int64"
                     },
                     "Time": {
-                        "description": "The time of the request.",
+                        "description": "The duration, in milliseconds, that Arc took to process and respond to the request.",
                         "type": "integer",
                         "format": "int32"
                     },
-                    "Error": {
-                        "description": "The error of the request.",
+                    "RemoteIP": {
+                        "description": "The IP address of the client or system that originated the request.",
                         "type": "string"
                     },
                     "status": {
-                        "description": "The status of the request.",
+                        "description": "The HTTP status code returned by the request (such as 200 for success, 404 for not found, or 500 for server error).",
+                        "type": "string"
+                    },
+                    "User": {
+                        "description": "The authenticated username or account that initiated the request, if authentication was used.",
                         "type": "string"
                     },
                     "InstanceId": {
-                        "description": "The host which writes the log in the HA environment.",
+                        "description": "The machine name of the server running Arc that handled the request. Primarily used in high availability (HA) or clustered environments.",
                         "type": "string"
+                    },
+                    "Timestamp": {
+                        "description": "The date and time the request was received and processing began.",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "Error": {
+                        "description": "Any error message or exception details captured if the request failed or encountered issues.",
+                        "type": "string"
+                    },
+                    "Script": {
+                        "description": "The internal script or handler that processed the request.",
+                        "type": "string"
+                    },
+                    "Bytes": {
+                        "description": "The total size of the request payload in bytes, including headers and body content.",
+                        "type": "integer",
+                        "format": "int64"
                     }
                 },
                 "required": [
@@ -4832,78 +5456,78 @@
                 "type": "object",
                 "properties": {
                     "Id": {
-                        "description": "The id of the logs.",
+                        "description": "The Id assigned to each transaction log entry for tracking and querying specific file transfers.",
                         "type": "string"
                     },
-                    "ConnectorId": {
-                        "description": "The id of the connector.",
+                    "ETag": {
+                        "description": "An entity tag used for resuming interrupted AS2 file transfers through the AS2 Restart feature. Only applicable for AS2 Restart.",
                         "type": "string"
-                    },
-                    "PortId": {
-                        "description": "The id of the port.",
-                        "type": "string"
-                    },
-                    "WorkspaceId": {
-                        "description": "The id of the workspace.",
-                        "type": "string"
-                    },
-                    "Workspace": {
-                        "description": "The id of the workspace.",
-                        "type": "string"
-                    },
-                    "MessageId": {
-                        "description": "The message Id.",
-                        "type": "string"
-                    },
-                    "Direction": {
-                        "description": "The direction of the file transaction.",
-                        "type": "string"
-                    },
-                    "Status": {
-                        "description": "The status of the transaction.",
-                        "type": "string"
-                    },
-                    "Filename": {
-                        "description": "The name of the file being transferred.",
-                        "type": "string"
-                    },
-                    "FilePath": {
-                        "description": "The full path to the file that was sent or received.",
-                        "type": "string"
-                    },
-                    "FileSize": {
-                        "description": "The size of the file.",
-                        "type": "integer",
-                        "format": "int32"
                     },
                     "Timestamp": {
-                        "description": "The time that the file was sent or received.",
+                        "description": "The date and time when the file transfer was initiated or completed.",
                         "type": "string",
                         "format": "date-time"
                     },
-                    "ETag": {
-                        "description": "The ETag for the file being transferred. This is only available when using AS2 Restart.",
+                    "MessageId": {
+                        "description": "The Id assigned to the message that is part of the transaction.",
                         "type": "string"
                     },
-                    "InstanceId": {
-                        "description": "The host which writes the log in the HA environment.",
+                    "FileSize": {
+                        "description": "The size of the transferred file, in bytes.",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "WorkspaceId": {
+                        "description": "The Id of the workspace where the connector and transaction reside.",
                         "type": "string"
                     },
-                    "BatchGroupId": {
-                        "description": "The batch group message Id.",
+                    "FilePath": {
+                        "description": "The complete file system path to the file that was sent or received.",
                         "type": "string"
                     },
-                    "IsBatchGroup": {
-                        "description": "Whether it is a batch group message or not?",
-                        "type": "boolean"
+                    "Status": {
+                        "description": "The current state of the transaction (such as success, failed, pending, or in-progress).",
+                        "type": "string"
                     },
                     "ProcessingTime": {
-                        "description": "The total time taken to process the transaction, measured in milliseconds (ms).",
+                        "description": "The total duration, in milliseconds, that Arc took to process the transaction from start to completion.",
                         "type": "integer",
                         "format": "int64"
                     },
+                    "ConnectorId": {
+                        "description": "The Id of the connector that handled the transaction.",
+                        "type": "string"
+                    },
+                    "Filename": {
+                        "description": "The name of the file that was transferred, without path information.",
+                        "type": "string"
+                    },
+                    "InstanceId": {
+                        "description": "The machine name of the Arc server that logged the transaction. Primarily used in high availability (HA) or clustered environments.",
+                        "type": "string"
+                    },
+                    "Workspace": {
+                        "description": "The Id of the workspace where the transaction occurred.",
+                        "type": "string"
+                    },
                     "ConnectorType": {
-                        "description": "The ConnectorType about the current connector.",
+                        "description": "The type of connector that handled the transaction (such as AS2, SFTP, or Database).",
+                        "type": "string"
+                    },
+                    "Direction": {
+                        "description": "Indicates whether the transaction sent or received a file.",
+                        "type": "string"
+                    },
+                    "BatchGroupId": {
+                        "description": "The shared MessageId linking multiple related transactions that were processed together as a batch.",
+                        "type": "string"
+                    },
+                    "IsBatchGroup": {
+                        "description": "Indicates whether this transaction is part of a batch group containing multiple related messages.",
+                        "type": "boolean"
+                    },
+                    "PortId": {
+                        "description": "The internal Id of the specific port or endpoint within the connector that processed the transaction.",
                         "type": "string"
                     }
                 },
@@ -4915,27 +5539,31 @@
                 "type": "object",
                 "properties": {
                     "Id": {
-                        "description": "The vault setting id.",
+                        "description": "The Id assigned to each vault item for retrieval and management purposes.",
                         "type": "string"
                     },
                     "Name": {
-                        "description": "The vault setting name.",
+                        "description": "The descriptive name assigned to the vault item, used to reference it in connector configurations and scripts. Required when using POST to create a new vault item.",
                         "type": "string"
                     },
                     "Type": {
-                        "description": "The vault setting type.",
+                        "description": "Specifies whether the vault item is stored as Standard (plain text) or Encrypted (secured with encryption). When you create a vault item, if you do not supply a Type, the application creates a Standard vault item. Available values are 'Standard, Encrypted'.",
                         "type": "string"
                     },
+                    "IncludeUsage": {
+                        "description": "A comma-separated list of all resources (such as Profiles) that use the vault item. This input is not returned in responses by default, so it must be explicitly requested.",
+                        "type": "boolean"
+                    },
                     "ShowType": {
-                        "description": "Whether output type or displayName.",
+                        "description": "Controls whether to include the Type field in API responses when retrieving vault item information.",
+                        "type": "boolean"
+                    },
+                    "Value": {
+                        "description": "The data stored in the vault item. When making a GET request, this data is only included in the response when the Type is Standard. Encrypted data is not included. Required when using POST to create a new vault item.",
                         "type": "string"
                     },
                     "Tags": {
-                        "description": "The vault setting tags.",
-                        "type": "string"
-                    },
-                    "Value": {
-                        "description": "The vault setting value.",
+                        "description": "Comma-separated labels or keywords assigned to the vault item for organization and filtering purposes.",
                         "type": "string"
                     }
                 },
@@ -4947,7 +5575,99 @@
                 "type": "object",
                 "properties": {
                     "Workspaceid": {
-                        "description": "The Id of the workspace.",
+                        "description": "The workspace Id.",
+                        "type": "string"
+                    },
+                    "ArchiveDestination": {
+                        "description": "The type of storage location where archived transactions and files should be stored (such as local file system or S3). Available values are 'LocalDisk, S3'.",
+                        "type": "string"
+                    },
+                    "ArchiveFolder": {
+                        "description": "The file path or folder location where Arc stores archived transaction logs and processed files for long-term retention.",
+                        "type": "string"
+                    },
+                    "AutoTaskType": {
+                        "description": "The type of automated maintenance task to run. Available values are 'Delete, Archive'.",
+                        "type": "string"
+                    },
+                    "AutoTaskInterval": {
+                        "description": "How many days of records to keep.",
+                        "type": "string"
+                    },
+                    "CleanupReceiveFolder": {
+                        "description": "Include files in Receive folders in cleanup operations.",
+                        "type": "boolean"
+                    },
+                    "CleanupSendFolder": {
+                        "description": "Include files in Send folders in cleanup operations.",
+                        "type": "boolean"
+                    },
+                    "CleanupSentFolder": {
+                        "description": "Include files in Sent folders in cleanup operations.",
+                        "type": "boolean"
+                    },
+                    "CleanupTransactions": {
+                        "description": "Include transactions in cleanup operations.",
+                        "type": "boolean"
+                    },
+                    "EmailSendGridURL": {
+                        "description": "The SendGrid API endpoint URL used when sending email notifications through the SendGrid service.",
+                        "type": "string"
+                    },
+                    "EmailSendGridAPIKey": {
+                        "description": "The API key required to authenticate with SendGrid for sending emails from Arc.",
+                        "type": "string"
+                    },
+                    "EmailProtocol": {
+                        "description": "The email protocol to use for sending notifications. Available values are 'SMTP, SendGrid'.",
+                        "type": "string"
+                    },
+                    "NotifyEmail": {
+                        "description": "Send an email to the specified email addresses when an error is encountered.",
+                        "type": "boolean"
+                    },
+                    "NotifyEmailFrom": {
+                        "description": "The email address used as the sender of notification emails.",
+                        "type": "string"
+                    },
+                    "NotifyEmailTo": {
+                        "description": "A comma-separated list of notification email recipients.",
+                        "type": "string"
+                    },
+                    "NotifyEmailSubject": {
+                        "description": "The notification email subject.",
+                        "type": "string"
+                    },
+                    "MaxFilesPerPort": {
+                        "description": "The maximum number of files sent by each thread assigned to the connector.",
+                        "type": "string"
+                    },
+                    "MaxWorkersPerPort": {
+                        "description": "The number of worker threads allocated to the connector for parallel processing.",
+                        "type": "string"
+                    },
+                    "SMTPServer": {
+                        "description": "The host name or IP address of your SMTP server.",
+                        "type": "string"
+                    },
+                    "SMTPUser": {
+                        "description": "The username to authenticate to your SMTP server.",
+                        "type": "string"
+                    },
+                    "SMTPPassword": {
+                        "description": "The password to authenticate to your SMTP server.",
+                        "type": "string"
+                    },
+                    "SMTPPort": {
+                        "description": "The port of your SMTP server.",
+                        "type": "string"
+                    },
+                    "SMTPSSLMode": {
+                        "description": "The SSL mode of your SMTP server.",
+                        "type": "string"
+                    },
+                    "Other": {
+                        "description": "The list of properties above is not comprehensive. You can use the API to set any profile property not listed above, using the same name/value format. All available profile default properties are returned in a GET request. You do not need to include an Other property when using additional settings that are not listed here.",
                         "type": "string"
                     }
                 },
@@ -4960,19 +5680,19 @@
                 "properties": {
                     "Type": {
                         "type": "string",
-                        "description": "Whether to Archive or Delete files when performing the cleanup. If not specified, the cleanup settings specified in the application will be used."
+                        "description": "Whether to archive or delete files during cleanup. If not specified, the cleanup settings specified on the Settings > Advanced page are used."
                     },
                     "Age": {
                         "type": "string",
-                        "description": "Minimum age of the files to be cleaned up, in days. Files more recent than the specified age will not be cleaned up. If not specified, the cleanup settings specified in the application will be used."
+                        "description": "Minimum age, in days, of the files to clean up. Files more recent than the specified age are not touched. If not specified, the cleanup settings specified on the Settings > Advanced page are used."
                     },
                     "WorkspaceId": {
                         "type": "string",
-                        "description": "The Id of the workspace. If not set, all workspaces will be cleaned up."
+                        "description": "The Id of an individual workspace to clean up. If not provided, all workspaces are cleaned up."
                     },
                     "ConnectorId": {
                         "type": "string",
-                        "description": "The Id of the connector to be archived. If not set, all connectors in the applicable workspace(s) will be cleaned up."
+                        "description": "The Id of a specific connector to clean up. If not set, all connectors in the applicable workspace(s) are cleaned up."
                     }
                 }
             },
@@ -4986,7 +5706,7 @@
                 "properties": {
                     "WorkspaceId": {
                         "type": "string",
-                        "description": "The Id of the workspace."
+                        "description": "The Id of the workspace where the existing connector resides."
                     },
                     "ConnectorId": {
                         "type": "string",
@@ -4994,7 +5714,7 @@
                     },
                     "NewWorkspaceId": {
                         "type": "string",
-                        "description": "The Id of the new workspace.  If unspecified, the workspace of the original connector will be used."
+                        "description": "The Id of the workspace where the new connector should be placed. If not specified, it is placed in the original connector's workspace."
                     },
                     "NewConnectorId": {
                         "type": "string",
@@ -5009,7 +5729,7 @@
                     "properties": {
                         "AllowedPrivileges": {
                             "type": "string",
-                            "description": "The connector privileges."
+                            "description": "The access permissions that users or roles have on the new connector. The privileges control who can view, modify, or manage the connector within the workspace. Available values are 'UpdateSettings, Delete, Create, UploadFiles, SendFiles, ReceiveFiles, DeleteFiles, DeleteTransactions, Requeue'."
                         }
                     }
                 }
@@ -5024,7 +5744,7 @@
                 "properties": {
                     "WorkspaceId": {
                         "type": "string",
-                        "description": "The Id of the workspace."
+                        "description": "The Id of the existing workspace to copy."
                     },
                     "NewWorkspaceId": {
                         "type": "string",
@@ -5032,7 +5752,7 @@
                     },
                     "ConnectorIdSuffix": {
                         "type": "string",
-                        "description": "This suffix will be added to the end of the copied ConnectorIds"
+                        "description": "The suffix to add to the end of all the copied ConnectorIds."
                     }
                 }
             },
@@ -5043,7 +5763,7 @@
                     "properties": {
                         "Count": {
                             "type": "string",
-                            "description": "Number of copied Connectors."
+                            "description": "The number of copied connectors."
                         }
                     }
                 }
@@ -5059,63 +5779,63 @@
                 "properties": {
                     "Filename": {
                         "type": "string",
-                        "description": "The file name."
+                        "description": "The file name of the certificate to create, without an extension. Arc automatically adds the .pfx or .cer extension."
                     },
                     "CommonName": {
                         "type": "string",
-                        "description": "The common name."
+                        "description": "The primary identifier for the certificate, typically a domain name (such as server.company.com) or descriptive name."
                     },
                     "Serialnumber": {
                         "type": "string",
-                        "description": "The serial number."
+                        "description": "A unique numeric identifier for the certificate, used to distinguish it from other certificates with the same subject."
                     },
                     "Password": {
                         "type": "string",
-                        "description": "The password."
+                        "description": "The password that protects the private key in the generated certificate file."
                     },
                     "Country": {
                         "type": "string",
-                        "description": "The country."
+                        "description": "The two-letter ISO country code for the certificate subject (such as US or GB)."
                     },
                     "Email": {
                         "type": "string",
-                        "description": "The email."
+                        "description": "The email address associated with the certificate holder or administrator."
                     },
                     "Expiration": {
                         "type": "string",
-                        "description": "The expiration (in years).",
+                        "description": "The number of years from creation until the certificate expires and is no longer valid. The default is 1 year.",
                         "default": "1"
                     },
                     "KeySize": {
                         "type": "string",
-                        "description": "The key size.",
+                        "description": "The length of the cryptographic key in bits. Larger values provide stronger security, but performance can be slower. The default is 2048.",
                         "default": "2048"
                     },
                     "PublicKeyType": {
                         "type": "string",
-                        "description": "The public key type.",
+                        "description": "The format standard for the public key portion of the certificate.",
                         "default": "X.509"
                     },
                     "SignatureAlgorithm": {
                         "type": "string",
-                        "description": "The signature algorithm.",
+                        "description": "The cryptographic hashing algorithm used to sign the certificate (such as SHA256, SHA384, or SHA512). The default is SHA256.",
                         "default": "SHA256"
                     },
                     "Locality": {
                         "type": "string",
-                        "description": "The locality."
+                        "description": "The city or locality where the certificate holder is located."
                     },
                     "Organization": {
                         "type": "string",
-                        "description": "The organization."
+                        "description": "The legal name of the company or organization that owns the certificate."
                     },
                     "OrganizationalUnit": {
                         "type": "string",
-                        "description": "The organizational unit."
+                        "description": "The department or division within the organization (such as IT or Engineering)."
                     },
                     "State": {
                         "type": "string",
-                        "description": "The state."
+                        "description": "The state, province, or region where the certificate holder is located."
                     }
                 }
             },
@@ -5126,15 +5846,15 @@
                     "properties": {
                         "Name": {
                             "type": "string",
-                            "description": "The file name."
+                            "description": "The complete filename of the newly created private certificate file, with a .pfx extension."
                         },
                         "Password": {
                             "type": "string",
-                            "description": "The password."
+                            "description": "The password protecting the private key, returned for confirmation or storage purposes."
                         },
                         "Pubname": {
                             "type": "string",
-                            "description": "The public cert file name."
+                            "description": "The filename of the corresponding public certificate file (typically with a .cer extension) that can be shared with partners."
                         }
                     }
                 }
@@ -5142,45 +5862,47 @@
             "exchangeCert_input": {
                 "type": "object",
                 "required": [
+                    "WorkspaceId",
+                    "ConnectorId",
                     "Certificate",
                     "ExchangeType"
                 ],
                 "properties": {
                     "WorkspaceId": {
                         "type": "string",
-                        "description": "The workspace id. Required."
+                        "description": "The Id of the workspace containing the connector participating in the trading partner certificate exchange."
                     },
                     "ConnectorId": {
                         "type": "string",
-                        "description": "The connector id. Required."
+                        "description": "The Id of the AS2 or OFTP connector sending or receiving certificates during the exchange process."
                     },
                     "PortId": {
                         "type": "string",
-                        "description": "The port id."
+                        "description": "The Id of the specific connector port or endpoint handling the certificate exchange operation with the trading partner."
                     },
                     "Certificate": {
                         "type": "string",
-                        "description": "The certificate to exchange."
+                        "description": "The full filename of the certificate (including the extension) to be sent to or exchanged with the remote trading partner."
                     },
                     "ExchangeType": {
                         "type": "string",
-                        "description": "The exchange type. Validate values are AS2(Request, Response), OFTP(Deliver, Request, Replace)"
+                        "description": "The type of certificate exchange operation: AS2 Request/Response (requesting or providing certificates), or OFTP Deliver/Request/Replace (delivering, requesting, or updating certificates)."
                     },
                     "CertificatePassword": {
                         "type": "string",
-                        "description": "The password of certificate(AS2)."
+                        "description": "The password protecting the private key in the certificate being exchanged (AS2 exchanges only)."
                     },
                     "CertificateUsage": {
                         "type": "string",
-                        "description": "The cryptographic function(s) for the certificate. Validate values are 'Encryption,Verification,ServerTLS,ClientTLS'(AS2)."
+                        "description": "The cryptographic purposes for which the certificate can be used, such as encryption, signature verification, or TLS connections (AS2 exchanges only). Available values are 'Encryption, Verification, ServerTLS, ClientTLS'."
                     },
                     "ResponseURL": {
                         "type": "string",
-                        "description": "The URL which the response should be sent(AS2)."
+                        "description": "The URL endpoint where the trading partner should send their certificate response when you initiate an AS2 certificate request."
                     },
                     "RequestId": {
                         "type": "string",
-                        "description": "The Request id(AS2)."
+                        "description": "An Id for tracking a specific AS2 certificate exchange request and matching it with the corresponding response."
                     }
                 }
             },
@@ -5189,15 +5911,15 @@
                 "properties": {
                     "WorkspaceId": {
                         "type": "string",
-                        "description": "The Id of the workspace to export. If unspecified, it's default."
+                        "description": "The Id of the workspace to export. If you do not specify either a workspace or a connector, all workspaces and all connectors are exported."
                     },
                     "ConnectorId#": {
                         "type": "string",
-                        "description": "The Id of the connector to export. If unspecified, all connectors will be exported. If the connector doesn't exist in the specified workspace, an error will be thrown. "
+                        "description": "The Id of the connector to export. To export multiple connectors in one request, repeat the ConnectorId parameter for each one. If you do not specify either a workspace or a connector, all connectors in all workspaces are exported. If you specify a connector and a workspace and the connector does not exist in the workspace, an error is thrown. "
                     },
                     "FlowAPI#": {
                         "type": "string",
-                        "description": "The Id of the flow API. "
+                        "description": "The Id of the Flow API to export. To export multiple Flow APIs in one request, repeat the FlowAPI parameter for each one."
                     },
                     "IncludeProfile": {
                         "type": "string",
@@ -5205,15 +5927,15 @@
                     },
                     "FlowPassword": {
                         "type": "string",
-                        "description": "The password for encrypting sensitive values."
+                        "description": "The password used to encrypt sensitive values (such as credentials and private keys) in the exported configuration file."
                     },
                     "GlobalSettings": {
                         "type": "string",
-                        "description": "The global settings that should be included in the export. One or more of the following values may be provided using a comma-separated string, or the special value \u201cALL\u201d can be used to export all global settings. Values: Partners, Documents, Users, Roles, Certificates, Connections, Vaults, Reports, Alerts, Advanced, AdminAPI, SSO."
+                        "description": "A comma-separated list of the global settings to include in the export. Use All to export all global settings. Available values are 'All, Alerts, Advanced, AdminAPI, Certificates, Connections, Documents, Partners, Reports, Roles, SSO, Users, Vaults'."
                     },
                     "ProfileSettings": {
                         "type": "string",
-                        "description": "The profiles that should be included in the export. One or more of the following values may be provided using a comma-separated string. The special value \u201cMATCHING\u201d can be used to export the matching profiles for the connectors included in the export. Values: AS2, AS4, GISB, RosettaNet, FTPServer, SFTPServer, HL7MLLP, OFTP."
+                        "description": "A comma-separated list of the profiles to include in the export. Use Matching to export only the profiles used by the connectors included in the export. Available values are 'Matching, AS2, AS4, FTPServer, GISB, HL7MLLP, OFTP, RosettaNet, SFTPServer'."
                     }
                 }
             },
@@ -5224,7 +5946,31 @@
                     "properties": {
                         "Arcflow": {
                             "type": "string",
-                            "description": "The base64 encoded content of the exported arcflow."
+                            "description": "The Base64-encoded content of the exported arcflow."
+                        }
+                    }
+                }
+            },
+            "exportDataEncryptionKey_input": {
+                "type": "object",
+                "required": [
+                    "Passphrase"
+                ],
+                "properties": {
+                    "Passphrase": {
+                        "type": "string",
+                        "description": "A user-defined string used to derive a temporary encryption key to secure the exported data encryption key material during transport."
+                    }
+                }
+            },
+            "exportDataEncryptionKey_output": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "KeyPackage": {
+                            "type": "string",
+                            "description": "An encrypted data block containing the data encryption key and its associated cryptographic metadata."
                         }
                     }
                 }
@@ -5234,11 +5980,11 @@
                 "properties": {
                     "WorkspaceId": {
                         "type": "string",
-                        "description": "When set, the API will return the count of pending messages for the specified workspace.  When left empty, all connectors will be returned from all workspaces."
+                        "description": "When set, the API returns the count of unsent messages for the specified workspace. When left empty, the message count for all connectors in all workspaces is returned."
                     },
                     "ConnectorId": {
                         "type": "string",
-                        "description": "The Ids of the Connector."
+                        "description": "The Id of the connector for which to get the message count. If not specified, the message count for all connectors is returned."
                     }
                 }
             },
@@ -5249,15 +5995,15 @@
                     "properties": {
                         "ConnectorId": {
                             "type": "string",
-                            "description": "The Id of the Connector."
+                            "description": "The Id of the connector."
                         },
                         "Count": {
                             "type": "string",
-                            "description": "The count of pending messages for the connector.  This value will be the count of all messages in the Send folder."
+                            "description": "The count of unsent messages for the connector. This value is the count of all messages in the Send folder."
                         },
                         "Workspace": {
                             "type": "string",
-                            "description": "The connector's workspace."
+                            "description": "The workspace the connector is in."
                         }
                     }
                 }
@@ -5265,38 +6011,39 @@
             "getTransactionLogs_input": {
                 "type": "object",
                 "required": [
+                    "ConnectorId",
                     "MessageId",
                     "Direction"
                 ],
                 "properties": {
-                    "WorkspaceId": {
-                        "type": "string",
-                        "description": "The id of the connector. Required."
-                    },
                     "ConnectorId": {
                         "type": "string",
-                        "description": "The id of the connector. Required."
-                    },
-                    "PortId": {
-                        "type": "string",
-                        "description": "The id of the port."
+                        "description": "The Id of the connector whose transaction logs you want to retrieve."
                     },
                     "MessageId": {
                         "type": "string",
-                        "description": "The message Id."
+                        "description": "The message Id for the specific transaction whose logs you want to retrieve."
                     },
                     "Direction": {
                         "type": "string",
-                        "description": "The direction of the transaction."
+                        "description": "Specifies whether to retrieve logs for sent or received files."
+                    },
+                    "WorkspaceId": {
+                        "type": "string",
+                        "description": "The Id of the workspace containing the connector whose transaction logs you want to retrieve."
                     },
                     "Type": {
                         "type": "string",
-                        "description": "The type of the log file."
+                        "description": "Specifies which type of log file to retrieve. The type is directly related to the file type in the transaction. Available values are 'ACK, Async MDN, Attachment, CEM, Data, EERP, Email Message, Error, Etag, Headers, Log, MDN, Message Content, Message, Name, NERP, Receipt, REF, Request, Response, Transformation Input, Transformation Output, Warning, Unknown'."
                     },
                     "IncludeContent": {
                         "type": "string",
-                        "description": "Whether to return the content of the log file.",
+                        "description": "When set to True, returns the actual content of the log file in the response. When False, returns only metadata about the log file. The default is False.",
                         "default": "False"
+                    },
+                    "PortId": {
+                        "type": "string",
+                        "description": "The Id of the port."
                     }
                 }
             },
@@ -5307,7 +6054,7 @@
                     "properties": {
                         "TimeCreated": {
                             "type": "string",
-                            "description": "The time the log file was created."
+                            "description": "The date and time the log file was created."
                         },
                         "Type": {
                             "type": "string",
@@ -5319,11 +6066,11 @@
                         },
                         "Path": {
                             "type": "string",
-                            "description": "The path of the log file."
+                            "description": "The full path to the log file."
                         },
                         "Content": {
                             "type": "string",
-                            "description": "The Base64 encoded content of the log file."
+                            "description": "The Base64-encoded content of the log file."
                         }
                     }
                 }
@@ -5333,20 +6080,20 @@
                 "properties": {
                     "Arcflow": {
                         "type": "string",
-                        "description": "A base64 encoded string containing the zip data for the arcflow."
+                        "description": "A Base64-encoded string containing a zip file of the Arc configuration data that has been exported from another instance."
                     },
                     "DuplicateAction": {
                         "type": "string",
-                        "description": "Overwrite, Rename, Skip."
+                        "description": "How to handle duplicates that exist in the instance being imported into. Available values are 'Overwrite, Rename, Skip'."
                     },
                     "Overwrite": {
                         "type": "string",
-                        "description": "Overwrite the duplicated source.",
+                        "description": "When set to True, replaces existing connectors, flows, or settings with the same names. When False, skips duplicates and preserves existing configurations. The default is False. Available values are 'True, False'.",
                         "default": "False"
                     },
                     "WorkspaceId": {
                         "type": "string",
-                        "description": "The Workspace to import the arcflow into. If unspecified, the application will auto-detect which workspace to use based on the names of the workspaces in the arcflow, and fall back to the default workspace if no workspace is specified in the arcflow."
+                        "description": "The Id of the workspace to import the arcflow into. If you do not specify a workspace, the application auto-detects which workspace to use based on the names of the workspaces in the arcflow. If a workspace is not specified in the arcflow, it uses the default workspace."
                     },
                     "InputName": {
                         "type": "string",
@@ -5358,40 +6105,72 @@
                     },
                     "DecryptPassword": {
                         "type": "string",
-                        "description": "The password for decrypting sensitive values."
+                        "description": "The password used to decrypt sensitive values (such as credentials and private keys) that were encrypted during the export process with FlowPassword."
                     },
                     "GlobalSettings": {
                         "type": "string",
-                        "description": "The global settings that should be included in the import. One or more of the following values may be provided using a comma-separated string, or the special value \u201cALL\u201d can be used to import all global settings. Values: Partners, Documents, Users, Roles, Certificates, Connections, Vaults, Reports, Alerts, Advanced, AdminAPI, SSO."
+                        "description": "A comma-separated list of the global settings to import. Use ALL to import all global settings. Available values are 'All, Alerts, Advanced, AdminAPI, Certificates, Connections, Documents, Partners, Reports, Roles, SSO, Users, Vaults'."
                     },
                     "ProfileSettings": {
                         "type": "string",
-                        "description": "The profiles that should be included in the import. One or more of the following values may be provided using a comma-separated string. The special value \u201cALL\u201d can be used to import all profiles. Values: AS2, AS4, GISB, RosettaNet, FTPServer, SFTPServer, HL7MLLP, OFTP."
+                        "description": "A comma-separated list of the profiles to import. Use ALL to import all profiles. Available values are 'All, AS2, AS4, FTPServer, GISB, HL7MLLP, OFTP, RosettaNet, SFTPServer'."
+                    }
+                }
+            },
+            "importDataEncryptionKey_input": {
+                "type": "object",
+                "required": [
+                    "KeyPackage",
+                    "Passphrase"
+                ],
+                "properties": {
+                    "KeyPackage": {
+                        "type": "string",
+                        "description": "An encrypted data block containing the data encryption key and its associated cryptographic metadata."
+                    },
+                    "Passphrase": {
+                        "type": "string",
+                        "description": "The passphrase that was used when the key was created and exported."
+                    }
+                }
+            },
+            "importDataEncryptionKey_output": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "Status": {
+                            "type": "string",
+                            "description": "The operational result indicating whether the key material was successfully processed, validated, and persisted."
+                        }
                     }
                 }
             },
             "receiveFile_input": {
                 "type": "object",
+                "required": [
+                    "ConnectorId"
+                ],
                 "properties": {
-                    "WorkspaceId": {
-                        "type": "string",
-                        "description": "The workspace id of the connector."
-                    },
                     "ConnectorId": {
                         "type": "string",
-                        "description": "The id of the connector. Required."
+                        "description": "The connector Id."
+                    },
+                    "WorkspaceId": {
+                        "type": "string",
+                        "description": "The Id of the workspace containing the connector."
                     },
                     "PortId": {
                         "type": "string",
-                        "description": "The id of the port."
+                        "description": "The Id of the port to use for the connection."
                     },
                     "File": {
                         "type": "string",
-                        "description": "The file to be downloaded. When file is not supplied, all files will be downloaded based on the connector's settings."
+                        "description": "The specific filename to receive. If omitted, all files matching the connector settings are received. Only available for FTP, SFTP, and S3 connectors."
                     },
                     "RemotePath": {
                         "type": "string",
-                        "description": "The path to overrides the Remote path settings in the connector(Only used for FTP, SFTP)"
+                        "description": "Sets the remote path on the server from which the application downloads files. Use a comma-separated list to supply paths to multiple folders. Only available for FTP, SFTP, and S3 connectors."
                     }
                 }
             },
@@ -5402,61 +6181,86 @@
                     "properties": {
                         "MessageId": {
                             "type": "string",
-                            "description": "The message id of the file."
+                            "description": "The message Id associated with the file."
                         },
                         "Subfolder": {
                             "type": "string",
-                            "description": "The subfolder of the file."
+                            "description": "The subfolder path where the received file was stored."
                         },
                         "File": {
                             "type": "string",
-                            "description": "The name of the file."
+                            "description": "The name of the received file(s)."
                         },
                         "FileSize": {
                             "type": "string",
-                            "description": "The size of the file."
+                            "description": "The size of the received file(s) in bytes."
                         },
                         "ErrorMessage": {
                             "type": "string",
-                            "description": "When multiple files are transferred over the same connection, this will return the error message if an individual file transfer failed. If this is empty, the file transfer was successful."
+                            "description": "When multiple files are transferred over the same connection, this returns an error message when an individual file transfer fails. If this is empty, the file transfer succeeded."
                         }
+                    }
+                }
+            },
+            "requeueMessage_input": {
+                "type": "object",
+                "required": [
+                    "WorkspaceId",
+                    "ConnectorId",
+                    "MessageId"
+                ],
+                "properties": {
+                    "WorkspaceId": {
+                        "type": "string",
+                        "description": "The Id of the workspace associated with the message."
+                    },
+                    "ConnectorId": {
+                        "type": "string",
+                        "description": "The Id of the connector that the message belongs to."
+                    },
+                    "MessageId": {
+                        "type": "string",
+                        "description": "The message Id."
                     }
                 }
             },
             "sendFile_input": {
                 "type": "object",
+                "required": [
+                    "ConnectorId"
+                ],
                 "properties": {
-                    "WorkspaceId": {
-                        "type": "string",
-                        "description": "The workspace id of the connector."
-                    },
                     "ConnectorId": {
                         "type": "string",
-                        "description": "The id of the connector. Required."
+                        "description": "The Id of the connector sending the file."
+                    },
+                    "WorkspaceId": {
+                        "type": "string",
+                        "description": "The Id of the workspace containing the connector to use to send the file."
                     },
                     "PortId": {
                         "type": "string",
-                        "description": "The id of the port."
+                        "description": "The Id of the port to use for the file transfer connection."
                     },
                     "MessageId": {
                         "type": "string",
-                        "description": "The message id."
+                        "description": "The Id associated with this message for tracking and correlation."
                     },
                     "File": {
                         "type": "string",
-                        "description": "The file name."
+                        "description": "The name of the file to send."
                     },
                     "Subfolder": {
                         "type": "string",
-                        "description": "The subfolder of the file."
+                        "description": "The subfolder path where the file is located or should be organized."
                     },
                     "Attachment#": {
                         "type": "string",
-                        "description": "The attachment file."
+                        "description": "The file attachment to send. This name must match a message name in the Send folder for the attachment to be included. The # enables you to increment and include multiple attachments (such as Attachment1, Attachment2)."
                     },
                     "FormatResult": {
                         "type": "string",
-                        "description": "Is format result."
+                        "description": "Whether to format the output for readability or return it in raw format. The default is False. Available values are 'True, False'."
                     }
                 }
             },
@@ -5467,11 +6271,11 @@
                     "properties": {
                         "MessageId": {
                             "type": "string",
-                            "description": "The message Id."
+                            "description": "The Id assigned to this sent message for tracking and reference."
                         },
                         "File": {
                             "type": "string",
-                            "description": "The file name."
+                            "description": "The name of the sent file."
                         }
                     }
                 }
