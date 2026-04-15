@@ -298,6 +298,127 @@ export function createActionTools(client: ArcApiClient) {
           };
         }
       }
+    },
+
+    {
+      name: "requeue_message",
+      description: "Re-queue a failed or stuck message for reprocessing by its connector",
+      inputSchema: {
+        type: "object",
+        properties: {
+          workspaceId: {
+            type: "string",
+            description: "The ID of the workspace associated with the message (required)"
+          },
+          connectorId: {
+            type: "string",
+            description: "The ID of the connector that the message belongs to (required)"
+          },
+          messageId: {
+            type: "string",
+            description: "The message ID to requeue (required)"
+          }
+        },
+        required: ["workspaceId", "connectorId", "messageId"]
+      },
+      handler: async (args: any) => {
+        const schema = z.object({
+          workspaceId: z.string().min(1, "Workspace ID is required"),
+          connectorId: z.string().min(1, "Connector ID is required"),
+          messageId: z.string().min(1, "Message ID is required")
+        });
+        const validated = schema.parse(args);
+
+        await client.requeueMessage({
+          WorkspaceId: validated.workspaceId,
+          ConnectorId: validated.connectorId,
+          MessageId: validated.messageId
+        });
+
+        return {
+          content: [{
+            type: "text",
+            text: `**Message Requeued Successfully**\n\n` +
+              `**Workspace:** ${validated.workspaceId}\n` +
+              `**Connector:** ${validated.connectorId}\n` +
+              `**Message ID:** ${validated.messageId}\n\n` +
+              `The message has been re-queued for processing.`
+          }]
+        };
+      }
+    },
+
+    {
+      name: "export_data_encryption_key",
+      description: "Export the Arc data encryption key as an encrypted key package, secured with a passphrase for safe transport",
+      inputSchema: {
+        type: "object",
+        properties: {
+          passphrase: {
+            type: "string",
+            description: "A user-defined passphrase used to encrypt the exported key package (required)"
+          }
+        },
+        required: ["passphrase"]
+      },
+      handler: async (args: any) => {
+        const schema = z.object({
+          passphrase: z.string().min(1, "Passphrase is required")
+        });
+        const validated = schema.parse(args);
+
+        const results = await client.exportDataEncryptionKey({ Passphrase: validated.passphrase });
+        const keyPackage = results[0]?.KeyPackage;
+
+        return {
+          content: [{
+            type: "text",
+            text: `**Data Encryption Key Exported Successfully**\n\n` +
+              `**Key Package:** ${keyPackage || 'N/A'}\n\n` +
+              `Store this key package and your passphrase securely. You will need both to import the key on another instance.`
+          }]
+        };
+      }
+    },
+
+    {
+      name: "import_data_encryption_key",
+      description: "Import a previously exported Arc data encryption key using the key package and the passphrase it was exported with",
+      inputSchema: {
+        type: "object",
+        properties: {
+          keyPackage: {
+            type: "string",
+            description: "The encrypted key package string from a previous export_data_encryption_key call (required)"
+          },
+          passphrase: {
+            type: "string",
+            description: "The passphrase that was used when the key was originally exported (required)"
+          }
+        },
+        required: ["keyPackage", "passphrase"]
+      },
+      handler: async (args: any) => {
+        const schema = z.object({
+          keyPackage: z.string().min(1, "Key package is required"),
+          passphrase: z.string().min(1, "Passphrase is required")
+        });
+        const validated = schema.parse(args);
+
+        const results = await client.importDataEncryptionKey({
+          KeyPackage: validated.keyPackage,
+          Passphrase: validated.passphrase
+        });
+        const status = results[0]?.Status;
+
+        return {
+          content: [{
+            type: "text",
+            text: `**Data Encryption Key Import Result**\n\n` +
+              `**Status:** ${status || 'Completed'}`
+          }]
+        };
+      }
     }
   ];
 }

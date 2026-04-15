@@ -397,6 +397,44 @@ export interface SetFlowResult {
   // Empty response - just success indication
 }
 
+export interface ArcFlowApi {
+  WorkspaceId: string;
+  Name?: string;
+  Description?: string;
+  Method?: string;
+  Connectors?: string;
+  QueryParameters?: string;
+  BodyType?: string;
+  RequestContentType?: string;
+  RequestBody?: string;
+  ResponseContentType?: string;
+  RequestSample?: string;
+  ResponseSample?: string;
+}
+
+export interface RequeueMessageInput {
+  WorkspaceId: string;
+  ConnectorId: string;
+  MessageId: string;
+}
+
+export interface ExportDataEncryptionKeyInput {
+  Passphrase: string;
+}
+
+export interface ExportDataEncryptionKeyResult {
+  KeyPackage?: string;
+}
+
+export interface ImportDataEncryptionKeyInput {
+  KeyPackage: string;
+  Passphrase: string;
+}
+
+export interface ImportDataEncryptionKeyResult {
+  Status?: string;
+}
+
 // API response types
 export interface ApiResponse<T> {
   value?: T[];

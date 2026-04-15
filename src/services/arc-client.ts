@@ -10,6 +10,7 @@ import type {
   ArcCertificate,
   ArcReport,
   ArcRequest,
+  ArcFlowApi,
   CleanupInput,
   CleanupResult,
   CopyConnectorInput,
@@ -34,6 +35,11 @@ import type {
   SendFileResult,
   SetFlowInput,
   SetFlowResult,
+  RequeueMessageInput,
+  ExportDataEncryptionKeyInput,
+  ExportDataEncryptionKeyResult,
+  ImportDataEncryptionKeyInput,
+  ImportDataEncryptionKeyResult,
   ApiResponse,
   QueryParams
 } from '../types/arc-api.js';
@@ -415,7 +421,7 @@ export class ArcApiClient {
     if (!cleanedReport.Name) {
       cleanedReport.Name = name;
     }
-    const response = await this.client.put<ArcReport>('/reports', cleanedReport);
+    const response = await this.client.put<ArcReport>(`/reports('${name}')`, cleanedReport);
     return response.data;
   }
 
@@ -515,5 +521,47 @@ export class ArcApiClient {
   async setFlow(input: SetFlowInput): Promise<void> {
     const response = await this.client.post<ApiResponse<SetFlowResult>>('/setFlow', input);
     // Returns empty value array on success
+  }
+
+  // FlowAPI operations
+  async getFlowApis(params?: QueryParams): Promise<ArcFlowApi[]> {
+    const queryString = this.buildQueryString(params);
+    const response = await this.client.get<ApiResponse<ArcFlowApi>>(`/flowAPIs${queryString}`);
+    return response.data.value || [];
+  }
+
+  async getFlowApi(workspaceId: string): Promise<ArcFlowApi | null> {
+    try {
+      const response = await this.client.get<ArcFlowApi>(`/flowAPIs('${workspaceId}')`);
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.status === 404) return null;
+      throw error;
+    }
+  }
+
+  async createFlowApi(flowApi: Partial<ArcFlowApi>): Promise<ArcFlowApi> {
+    const response = await this.client.post<ArcFlowApi>('/flowAPIs', flowApi);
+    return response.data;
+  }
+
+  async deleteFlowApi(workspaceId: string): Promise<void> {
+    await this.client.delete(`/flowAPIs('${workspaceId}')`);
+  }
+
+  // Encryption key operations
+  async exportDataEncryptionKey(input: ExportDataEncryptionKeyInput): Promise<ExportDataEncryptionKeyResult[]> {
+    const response = await this.client.post<ExportDataEncryptionKeyResult[]>('/exportDataEncryptionKey', input);
+    return response.data;
+  }
+
+  async importDataEncryptionKey(input: ImportDataEncryptionKeyInput): Promise<ImportDataEncryptionKeyResult[]> {
+    const response = await this.client.post<ImportDataEncryptionKeyResult[]>('/importDataEncryptionKey', input);
+    return response.data;
+  }
+
+  // Message operations
+  async requeueMessage(input: RequeueMessageInput): Promise<void> {
+    await this.client.post('/requeueMessage', input);
   }
 }
