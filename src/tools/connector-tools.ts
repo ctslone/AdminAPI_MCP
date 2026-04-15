@@ -228,7 +228,7 @@ export function createConnectorTools(client: ArcApiClient) {
           },
           connectorType: {
             type: "string",
-            description: "Connector type (e.g., 'AS2', 'FTP', 'SFTP', 'REST', 'File') (required)"
+            description: "Connector type (required). Always use the latest version of a connector when one exists — versioned types use the suffix 'v2', 'v3', etc. (e.g., use 'RESTv2' not 'REST', 'AS4v2' not 'AS4'). Other common types: 'AS2', 'FTP', 'SFTP', 'File', 'X12', 'MySQL'."
           },
           action: {
             type: "string",
@@ -256,8 +256,8 @@ export function createConnectorTools(client: ArcApiClient) {
             description: "Whether to automatically receive files at specified interval"
           },
           receiveInterval: {
-            type: "string", 
-            description: "Interval for automatic file receiving"
+            type: "string",
+            description: "Interval for automatic file receiving. Use a plain number (in minutes) for simple schedules, e.g., '15' for every 15 minutes, '60' for every hour. For complex schedules use a 5-part cron expression, e.g., '0 2 * * *' for daily at 2 AM."
           },
           maxWorkers: {
             type: "number",
@@ -361,7 +361,7 @@ export function createConnectorTools(client: ArcApiClient) {
 
     {
       name: "update_connector",
-      description: "Update an existing Arc connector's configuration. Automatically fetches the connector details to validate property names against available properties for that connector type. Only valid properties will be updated; invalid ones will be reported.\n\nIMPORTANT: The 'receiveinterval' property requires a 5-part cron expression: minute hour day-of-month month day-of-week. Example: '0 2 * * *' for daily at 2 AM. Ranges and lists supported (e.g., '*/2 8-17 * * 1,3,5' for every even minute 8AM-5PM on Mon/Wed/Fri).\n\nCommon SFTP examples: 'host', 'port', 'username', 'password', 'automationsend', 'receiveinterval'. Common AS2 examples: 'as2identifier', 'url', 'certificate', 'signingcertificate', 'useencryption', 'usesigning'.",
+      description: "Update an existing Arc connector's configuration. Automatically fetches the connector details to validate property names against available properties for that connector type. Only valid properties will be updated; invalid ones will be reported.\n\nFor the 'receiveinterval' property, use a plain number (in minutes) for simple schedules (e.g., '15' for every 15 minutes, '60' for every hour). Use a 5-part cron expression only for complex schedules (e.g., '0 2 * * *' for daily at 2 AM).\n\nCommon REST/SFTP examples: 'url', 'host', 'port', 'username', 'password', 'automationsend', 'automationreceive', 'receiveinterval'. Common AS2 examples: 'as2identifier', 'url', 'certificate', 'signingcertificate', 'useencryption', 'usesigning'.",
       inputSchema: {
         type: "object",
         properties: {
@@ -404,15 +404,13 @@ export function createConnectorTools(client: ArcApiClient) {
           warnings.push(`The following properties don't exist in this connector type and were not updated:\n  • ${unknownProps.join('\n  • ')}`);
         }
 
-        // Special validation for receiveinterval - must be a valid cron expression
+        // Validate receiveinterval - accepts either a plain number (minutes) or a 5-part cron expression
         if (validated.properties.receiveinterval) {
-          const cronPattern = String(validated.properties.receiveinterval).trim();
-          // Basic cron validation: should have 5 parts separated by spaces
-          // Format: minute hour day-of-month month day-of-week
-          const cronParts = cronPattern.split(/\s+/);
-          if (cronParts.length !== 5) {
-            warnings.push(`'receiveinterval' value '${cronPattern}' doesn't appear to be a valid cron expression. Expected format: 'minute hour day-of-month month day-of-week' (e.g., '0 2 * * *' for daily at 2 AM). The value was not updated.`);
-            // Remove receiveinterval from update since it's invalid
+          const value = String(validated.properties.receiveinterval).trim();
+          const isPlainNumber = /^\d+$/.test(value);
+          const isCronExpression = value.split(/\s+/).length === 5;
+          if (!isPlainNumber && !isCronExpression) {
+            warnings.push(`'receiveinterval' value '${value}' is not valid. Use a plain number of minutes (e.g., '15') or a 5-part cron expression (e.g., '0 2 * * *'). The value was not updated.`);
             delete validated.properties.receiveinterval;
           }
         }
