@@ -313,7 +313,7 @@ export function createCertificateTools(client: ArcApiClient) {
 
     {
       name: "create_cert",
-      description: "Create a public/private certificate key pair. IMPORTANT: All 4 required parameters (filename, commonName, serialnumber, password) must be provided. Use a unique serial number like a timestamp or random number.",
+      description: "Create a public/private certificate key pair. IMPORTANT: All 4 required parameters (filename, commonName, serialnumber, password) must be provided. Use a unique serial number like a timestamp or random number.\n\nThis generates TWO files from a single filename (e.g., 'MyCert.pfx'):\n- MyCert.pfx — contains the private key. Use this for as2:signingkeypath and as2:privatekeypath in the AS2 profile.\n- MyCert.cer — contains the public certificate only. Use this for as2:publickeypath in the AS2 profile, and share it with trading partners so they can encrypt messages to you.",
       inputSchema: {
         type: "object",
         properties: {
@@ -398,24 +398,27 @@ export function createCertificateTools(client: ArcApiClient) {
 
         const result = await client.createCert(certInput);
 
+        const baseName = validated.filename.replace(/\.[^.]+$/, '');
+        const pfxFile = validated.filename;
+        const cerFile = `${baseName}.cer`;
+
         let responseText = `**Certificate Created Successfully**\n\n` +
-          `**Filename:** ${validated.filename}\n` +
           `**Common Name:** ${validated.commonName}\n` +
           `**Serial Number:** ${validated.serialnumber}`;
 
         if (result && result.length > 0) {
-          if (result[0].Name) {
-            responseText += `\n**Created File:** ${result[0].Name}`;
-          }
           if (result[0].Password) {
             responseText += `\n**Password:** ${result[0].Password}`;
           }
         }
 
-        // Add configuration details
         if (validated.expiration) responseText += `\n**Expiration:** ${validated.expiration} years`;
         if (validated.keySize) responseText += `\n**Key Size:** ${validated.keySize}`;
         if (validated.signatureAlgorithm) responseText += `\n**Signature Algorithm:** ${validated.signatureAlgorithm}`;
+
+        responseText += `\n\n**Two files were created:**\n` +
+          `- **${pfxFile}** — private key file. Use for as2:signingkeypath and as2:privatekeypath.\n` +
+          `- **${cerFile}** — public certificate only. Use for as2:publickeypath. Share this file with trading partners.`;
 
         return {
           content: [{
