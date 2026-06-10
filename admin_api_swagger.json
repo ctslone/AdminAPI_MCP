@@ -2,11 +2,11 @@
     "openapi": "3.0.1",
     "info": {
         "title": "RSSBus OpenAPI",
-        "version": "26.2.9600.0"
+        "version": "26.3.9656.0"
     },
     "servers": [
         {
-            "url": "http://localhost:8001/api.rsc"
+            "url": "https://arc-dev.arc.clouddataos.com"
         }
     ],
     "paths": {
@@ -1580,6 +1580,1040 @@
                         "name": "WorkspaceId",
                         "in": "path",
                         "description": "The key WorkspaceId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "propertyName",
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The property name",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The property value",
+                        "content": {
+                            "text/plain; charset=utf-8": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "text/plain; charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
+        "/flowConnections": {
+            "get": {
+                "summary": "Return flowConnections",
+                "description": "Returns records from the flowConnections entity that match the specified query parameters.  All records will be returned when no parameters are specified.",
+                "tags": [
+                    "flowConnections"
+                ],
+                "operationId": "getAllflowConnections",
+                "parameters": [
+                    {
+                        "name": "$select",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "A comma-separated list of properties to include in the results. When this field is left empty, all properties will be returned."
+                    },
+                    {
+                        "name": "$orderby",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Order the results by this property in ascending or descending order.  Example for ascending: 'Name ASC' Example for descending: 'Name DESC'"
+                    },
+                    {
+                        "name": "$top",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "The number of results to return."
+                    },
+                    {
+                        "name": "$skip",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "This is the offset of results to skip when returning results."
+                    },
+                    {
+                        "name": "$count",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "description": "When set, the results will return a count of results and not the actual results."
+                    },
+                    {
+                        "name": "$filter",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Use this to filter the results by specific property values. For example, you can use the following filter to retrieve records with the name 'John': $filter=Name eq 'John'"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "flowConnections response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "value": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/flowConnections"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            },
+            "post": {
+                "summary": "Create flowConnections",
+                "description": "Creates a new flowConnections object with the specified parameters.",
+                "tags": [
+                    "flowConnections"
+                ],
+                "operationId": "createflowConnections",
+                "requestBody": {
+                    "description": "The flowConnections entity to post",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/flowConnections"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "flowConnections created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/flowConnections"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
+        "/flowConnections/$count": {
+            "get": {
+                "summary": "Return count of flowConnections",
+                "description": "Returns count of records from the flowConnections entity that match the specified query parameters.  All count will be returned when no parameters are specified.",
+                "tags": [
+                    "flowConnections"
+                ],
+                "operationId": "getflowConnectionsCount",
+                "parameters": [
+                    {
+                        "name": "$filter",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Use this to filter the results by specific property values. For example, you can use the following filter to retrieve records with the name 'John': $filter=Name eq 'John'"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The count",
+                        "content": {
+                            "text/plain; charset=utf-8": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "int32"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "text/plain; charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
+        "/flowConnections(WorkspaceId='{WorkspaceId}',ConnectorId='{ConnectorId}',Output='{Output}')": {
+            "get": {
+                "summary": "Return a single flowConnections",
+                "description": "Returns a single flowConnections object using the specified key.",
+                "tags": [
+                    "flowConnections"
+                ],
+                "operationId": "getflowConnections",
+                "parameters": [
+                    {
+                        "name": "WorkspaceId",
+                        "in": "path",
+                        "description": "The key WorkspaceId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ConnectorId",
+                        "in": "path",
+                        "description": "The key ConnectorId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Output",
+                        "in": "path",
+                        "description": "The key Output",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "$select",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Select structural property"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "flowConnections response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/flowConnections"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            },
+            "put": {
+                "summary": "Update flowConnections",
+                "description": "Updates the specified flowConnections object.",
+                "tags": [
+                    "flowConnections"
+                ],
+                "operationId": "updateflowConnections",
+                "parameters": [
+                    {
+                        "name": "WorkspaceId",
+                        "in": "path",
+                        "description": "The key WorkspaceId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ConnectorId",
+                        "in": "path",
+                        "description": "The key ConnectorId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Output",
+                        "in": "path",
+                        "description": "The key Output",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "The flowConnections entity to update.",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/flowConnections"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "EntitySet flowConnections",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/flowConnections"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "flowConnections updated",
+                        "content": {}
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            },
+            "delete": {
+                "summary": "Delete flowConnections",
+                "description": "Deletes the specified flowConnections object.",
+                "tags": [
+                    "flowConnections"
+                ],
+                "operationId": "deleteflowConnections",
+                "parameters": [
+                    {
+                        "name": "WorkspaceId",
+                        "in": "path",
+                        "description": "The key WorkspaceId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ConnectorId",
+                        "in": "path",
+                        "description": "The key ConnectorId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Output",
+                        "in": "path",
+                        "description": "The key Output",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "flowConnections deleted",
+                        "content": {}
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
+        "/flowConnections(WorkspaceId='{WorkspaceId}',ConnectorId='{ConnectorId}',Output='{Output}')/{propertyName}/$value": {
+            "get": {
+                "summary": "Return specified property value of specified flowConnections",
+                "description": "Returns property value of flowConnections object using the specified key and property name.",
+                "tags": [
+                    "flowConnections"
+                ],
+                "operationId": "getflowConnectionsProperty",
+                "parameters": [
+                    {
+                        "name": "WorkspaceId",
+                        "in": "path",
+                        "description": "The key WorkspaceId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ConnectorId",
+                        "in": "path",
+                        "description": "The key ConnectorId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Output",
+                        "in": "path",
+                        "description": "The key Output",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "propertyName",
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The property name",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The property value",
+                        "content": {
+                            "text/plain; charset=utf-8": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "text/plain; charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
+        "/flowNodes": {
+            "get": {
+                "summary": "Return flowNodes",
+                "description": "Returns records from the flowNodes entity that match the specified query parameters.  All records will be returned when no parameters are specified.",
+                "tags": [
+                    "flowNodes"
+                ],
+                "operationId": "getAllflowNodes",
+                "parameters": [
+                    {
+                        "name": "$select",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "A comma-separated list of properties to include in the results. When this field is left empty, all properties will be returned."
+                    },
+                    {
+                        "name": "$orderby",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Order the results by this property in ascending or descending order.  Example for ascending: 'Name ASC' Example for descending: 'Name DESC'"
+                    },
+                    {
+                        "name": "$top",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "The number of results to return."
+                    },
+                    {
+                        "name": "$skip",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "This is the offset of results to skip when returning results."
+                    },
+                    {
+                        "name": "$count",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "description": "When set, the results will return a count of results and not the actual results."
+                    },
+                    {
+                        "name": "$filter",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Use this to filter the results by specific property values. For example, you can use the following filter to retrieve records with the name 'John': $filter=Name eq 'John'"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "flowNodes response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "value": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/flowNodes"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            },
+            "post": {
+                "summary": "Create flowNodes",
+                "description": "Creates a new flowNodes object with the specified parameters.",
+                "tags": [
+                    "flowNodes"
+                ],
+                "operationId": "createflowNodes",
+                "requestBody": {
+                    "description": "The flowNodes entity to post",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/flowNodes"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "flowNodes created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/flowNodes"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
+        "/flowNodes/$count": {
+            "get": {
+                "summary": "Return count of flowNodes",
+                "description": "Returns count of records from the flowNodes entity that match the specified query parameters.  All count will be returned when no parameters are specified.",
+                "tags": [
+                    "flowNodes"
+                ],
+                "operationId": "getflowNodesCount",
+                "parameters": [
+                    {
+                        "name": "$filter",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Use this to filter the results by specific property values. For example, you can use the following filter to retrieve records with the name 'John': $filter=Name eq 'John'"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The count",
+                        "content": {
+                            "text/plain; charset=utf-8": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "int32"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "text/plain; charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
+        "/flowNodes(WorkspaceId='{WorkspaceId}',ConnectorId='{ConnectorId}',Style='{Style}')": {
+            "get": {
+                "summary": "Return a single flowNodes",
+                "description": "Returns a single flowNodes object using the specified key.",
+                "tags": [
+                    "flowNodes"
+                ],
+                "operationId": "getflowNodes",
+                "parameters": [
+                    {
+                        "name": "WorkspaceId",
+                        "in": "path",
+                        "description": "The key WorkspaceId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ConnectorId",
+                        "in": "path",
+                        "description": "The key ConnectorId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Style",
+                        "in": "path",
+                        "description": "The key Style",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "$select",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Select structural property"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "flowNodes response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/flowNodes"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            },
+            "put": {
+                "summary": "Update flowNodes",
+                "description": "Updates the specified flowNodes object.",
+                "tags": [
+                    "flowNodes"
+                ],
+                "operationId": "updateflowNodes",
+                "parameters": [
+                    {
+                        "name": "WorkspaceId",
+                        "in": "path",
+                        "description": "The key WorkspaceId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ConnectorId",
+                        "in": "path",
+                        "description": "The key ConnectorId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Style",
+                        "in": "path",
+                        "description": "The key Style",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "The flowNodes entity to update.",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/flowNodes"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "EntitySet flowNodes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/flowNodes"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "flowNodes updated",
+                        "content": {}
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            },
+            "delete": {
+                "summary": "Delete flowNodes",
+                "description": "Deletes the specified flowNodes object.",
+                "tags": [
+                    "flowNodes"
+                ],
+                "operationId": "deleteflowNodes",
+                "parameters": [
+                    {
+                        "name": "WorkspaceId",
+                        "in": "path",
+                        "description": "The key WorkspaceId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ConnectorId",
+                        "in": "path",
+                        "description": "The key ConnectorId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Style",
+                        "in": "path",
+                        "description": "The key Style",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "flowNodes deleted",
+                        "content": {}
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
+        "/flowNodes(WorkspaceId='{WorkspaceId}',ConnectorId='{ConnectorId}',Style='{Style}')/{propertyName}/$value": {
+            "get": {
+                "summary": "Return specified property value of specified flowNodes",
+                "description": "Returns property value of flowNodes object using the specified key and property name.",
+                "tags": [
+                    "flowNodes"
+                ],
+                "operationId": "getflowNodesProperty",
+                "parameters": [
+                    {
+                        "name": "WorkspaceId",
+                        "in": "path",
+                        "description": "The key WorkspaceId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ConnectorId",
+                        "in": "path",
+                        "description": "The key ConnectorId",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Style",
+                        "in": "path",
+                        "description": "The key Style",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -4691,6 +5725,51 @@
                 ]
             }
         },
+        "/moveConnector": {
+            "post": {
+                "summary": "Moves a connector (settings, state and transaction history) from one workspace to another, or renames it within the same workspace. The original connector is removed.",
+                "description": "Moves a connector (settings, state and transaction history) from one workspace to another, or renames it within the same workspace. The original connector is removed.",
+                "tags": [
+                    "moveConnector"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/moveConnector_input"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "The action result"
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CDataError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basic": []
+                    },
+                    {
+                        "authtoken_header": []
+                    },
+                    {
+                        "authtoken_query": []
+                    }
+                ]
+            }
+        },
         "/receiveFile": {
             "post": {
                 "summary": "Triggers the Receive action for a specific connector to receive one or more specified file(s).",
@@ -5122,6 +6201,69 @@
                 },
                 "required": [
                     "WorkspaceId"
+                ]
+            },
+            "flowConnections": {
+                "type": "object",
+                "properties": {
+                    "WorkspaceId": {
+                        "description": "The Id of the workspace that contains the flow API.",
+                        "type": "string"
+                    },
+                    "ConnectorId": {
+                        "description": "The Id of the connector that contains the flow API.",
+                        "type": "string"
+                    },
+                    "Output": {
+                        "description": "The output name.",
+                        "type": "string"
+                    },
+                    "Destination": {
+                        "description": "The destination connector Id for the output.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "WorkspaceId",
+                    "ConnectorId",
+                    "Output"
+                ]
+            },
+            "flowNodes": {
+                "type": "object",
+                "properties": {
+                    "WorkspaceId": {
+                        "description": "The Id of the workspace that contains the flow API.",
+                        "type": "string"
+                    },
+                    "ConnectorId": {
+                        "description": "The Id of the connector that contains the flow API.",
+                        "type": "string"
+                    },
+                    "Style": {
+                        "description": "The node style.",
+                        "type": "string"
+                    },
+                    "PositionX": {
+                        "description": "The node position x.",
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "PositionY": {
+                        "description": "The node position y.",
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "Width": {
+                        "description": "The node width.",
+                        "type": "number",
+                        "format": "double"
+                    }
+                },
+                "required": [
+                    "WorkspaceId",
+                    "ConnectorId",
+                    "Style"
                 ]
             },
             "logs": {
@@ -6143,6 +7285,36 @@
                             "type": "string",
                             "description": "The operational result indicating whether the key material was successfully processed, validated, and persisted."
                         }
+                    }
+                }
+            },
+            "moveConnector_input": {
+                "type": "object",
+                "required": [
+                    "WorkspaceId",
+                    "ConnectorId",
+                    "NewConnectorId"
+                ],
+                "properties": {
+                    "WorkspaceId": {
+                        "type": "string",
+                        "description": "The Id of the workspace where the source connector resides."
+                    },
+                    "ConnectorId": {
+                        "type": "string",
+                        "description": "The Id of the connector to move."
+                    },
+                    "NewWorkspaceId": {
+                        "type": "string",
+                        "description": "The Id of the destination workspace. If not specified, the connector is renamed within the source workspace."
+                    },
+                    "NewConnectorId": {
+                        "type": "string",
+                        "description": "The Id of the connector in the destination workspace."
+                    },
+                    "Force": {
+                        "type": "string",
+                        "description": "When true, cross-workspace moves may disconnect existing workflow connections and continue. Default is false."
                     }
                 }
             },

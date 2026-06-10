@@ -4,8 +4,8 @@
       "command": "node",
       "args": ["./dist/index.js"],
       "env": {
-        "CDATA_BASE_URL": "http://localhost:8181/api.rsc",
-        "CDATA_AUTH_TOKEN": "your-token-here",
+        "CDATA_BASE_URL": "https://arc-dev.arc.clouddataos.com/api.rsc",
+        "CDATA_AUTH_TOKEN": "mcp:6v6M2a8b4R9i5q2R5y1v",
         "MCP_TRANSPORT_MODE": "stdio"
       }
     }

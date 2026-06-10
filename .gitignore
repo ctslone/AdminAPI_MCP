@@ -15,6 +15,9 @@ dist/
 .env.test.local
 .env.production.local
 
+# Config
+.claude-config.json
+
 # Logs
 logs
 *.log
