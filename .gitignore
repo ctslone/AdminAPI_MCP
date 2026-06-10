@@ -64,3 +64,6 @@ pids
 # Claude instructions (local development only)
 CLAUDE.md
 example_prompts.md
+
+# Local design docs / spike outputs (not for source control)
+docs/

@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "mcp__claude_ai_Atlassian__lookupJiraAccountId",
+      "mcp__claude_ai_Atlassian__addCommentToJiraIssue",
+      "mcp__claude_ai_Atlassian__getJiraIssue",
+      "mcp__claude_ai_Atlassian__createJiraIssue"
     ],
     "deny": [],
     "ask": []
